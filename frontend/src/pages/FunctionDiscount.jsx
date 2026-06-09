@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '@shopify/app-bridge-react';
-import { authenticatedFetch } from "@shopify/app-bridge-utils";
-import { Page, Card, Layout, Link, List, Badge, TextField, Button, Spinner, BlockStack } from '@shopify/polaris';
+import { useAppBridge } from '../shims/app-bridge-react';
+import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { Page, Card, Layout, Link, List, Badge, TextField, Button, Spinner, BlockStack } from '../components/PolarisWeb';
 
 import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 

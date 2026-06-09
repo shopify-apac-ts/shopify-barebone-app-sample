@@ -1,8 +1,8 @@
-import { useAppBridge } from '@shopify/app-bridge-react';
-import { Redirect } from '@shopify/app-bridge/actions';
-import { getSessionToken } from "@shopify/app-bridge-utils";
-import { Page, Card, ResourceList, Icon, Text } from '@shopify/polaris';
-import { CircleRightIcon } from '@shopify/polaris-icons';
+import { useAppBridge } from '../shims/app-bridge-react';
+import { Redirect } from '../shims/app-bridge-actions';
+import { getSessionToken } from "../shims/app-bridge-utils";
+import { Page, Card, ResourceList, Icon, Text } from '../components/PolarisWeb';
+import { CircleRightIcon } from '../shims/polaris-icons';
 
 // Index for all sample UIs using ResourceList as a link list.
 // Read https://polaris.shopify.com/components/resource-list
@@ -106,14 +106,6 @@ function Index() {
                             },
                             name: 'Order Management',
                             location: 'Order management sameple for fulfillments, transactions and fulfillment services with inventory management',
-                        },
-                        {
-                            id: 11,
-                            onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/multipass');
-                            },
-                            name: 'Multipass',
-                            location: 'Multipass sample with dummy SSO',
                         },
                         {
                             id: 12,

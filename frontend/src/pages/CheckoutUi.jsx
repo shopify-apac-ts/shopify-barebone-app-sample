@@ -1,6 +1,6 @@
-import { useAppBridge } from '@shopify/app-bridge-react';
-import { Redirect } from '@shopify/app-bridge/actions';
-import { Page, Card, Layout, Link, List, Badge, BlockStack } from '@shopify/polaris';
+import { useAppBridge } from '../shims/app-bridge-react';
+import { Redirect } from '../shims/app-bridge-actions';
+import { Page, Card, Layout, Link, List, Badge, BlockStack } from '../components/PolarisWeb';
 
 import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 

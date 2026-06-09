@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '@shopify/app-bridge-react';
-import { Redirect } from '@shopify/app-bridge/actions';
-import { getSessionToken, authenticatedFetch } from "@shopify/app-bridge-utils";
-import { Page, Card, Layout, Link, Button, Badge, BlockStack, List } from '@shopify/polaris';
+import { useAppBridge } from '../shims/app-bridge-react';
+import { Redirect } from '../shims/app-bridge-actions';
+import { getSessionToken, authenticatedFetch } from '../shims/app-bridge-utils';
+import { Page, Card, Layout, Link, Button, Badge, BlockStack, List } from '../components/PolarisWeb';
 
 import { _decodeSessionToken, foldLongLine } from "../utils/my_util";
 
