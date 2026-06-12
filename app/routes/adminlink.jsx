@@ -1,4 +1,6 @@
-import { embeddedPageLoader, loadAdminLink } from '../lib/legacy-routes.server.js';
+import { embeddedPageLoader } from '../lib/embedded.server.js';
+import { loadAdminLink } from '../lib/admin-link.server.js';
+import AdminLink from '../pages/AdminLink.jsx';
 
 export async function loader({ request }) {
   return embeddedPageLoader({
@@ -7,3 +9,5 @@ export async function loader({ request }) {
     handler: loadAdminLink,
   });
 }
+
+export default AdminLink;

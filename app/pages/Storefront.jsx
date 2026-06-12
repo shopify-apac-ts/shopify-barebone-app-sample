@@ -1,18 +1,15 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { Redirect } from '../shims/app-bridge-actions';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, List, Button, Spinner, BlockStack, Badge } from '../components/PolarisWeb';
 
-import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 
 // Storefront API sample
 // Read https://shopify.dev/docs/api/storefront
 function Storefront() {
-  const app = useAppBridge();
-  const redirect = Redirect.create(app);
+  const redirect = createRedirect();
 
-  const shop = _getShopFromQuery(window);
+  const shop = getShopFromLocation();
 
   const [result, setResult] = useState({});
   const [accessing, setAccessing] = useState(false);
@@ -32,7 +29,7 @@ function Storefront() {
                 <List.Item>
                   <Button variant="primary" onClick={() => {
                     setAccessing(true);
-                    authenticatedFetch(app)(`/storefront`).then((response) => {
+                    authenticatedFetch(`/storefront`).then((response) => {
                       response.json().then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
@@ -61,7 +58,7 @@ function Storefront() {
                 </List.Item>
                 <List.Item>
                   Open the <Link onClick={() => {
-                    redirect.dispatch(Redirect.Action.REMOTE, { url: `https://${window.location.hostname}/storefront?shop=${shop}&public_token=${result.public_token.accessToken}`, newContext: true });
+                    redirect.dispatch(RedirectAction.REMOTE, { url: `https://${getCurrentHost()}/storefront?shop=${shop}&public_token=${result.public_token.accessToken}`, newContext: true });
                   }}>plain custom storefront page
                   </Link> using Cart API, tokenless access, and Customer Account API login.
                 </List.Item>

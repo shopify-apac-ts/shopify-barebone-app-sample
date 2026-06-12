@@ -1,18 +1,16 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, List, Badge, TextField, Button, Spinner, BlockStack } from '../components/PolarisWeb';
 
-import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 
 // Shopify Functions for discounts sample
 // Read https://shopify.dev/apps/discounts
 // This sample doesn't use Shopify given libraries for the app UX, create an extention manually. 
 // Read https://shopify.dev/api/functions/reference/order-discounts/
 function FunctionDiscount() {
-  const app = useAppBridge();
 
-  const shop = _getShopFromQuery(window);
+  const shop = getShopFromLocation();
 
   const [meta, setMeta] = useState('barebone_app.discount_rate');
   const metaChange = useCallback((newMeta) => setMeta(newMeta), []);
@@ -33,7 +31,7 @@ function FunctionDiscount() {
             </Layout.Section>
             <Layout.Section>
               <List type="number">
-                <List.Item>Add <Link url={`https://${_getAdminFromShop(shop)}/settings/custom_data`} target="_blank">Metafields</Link> for <Badge tone='info'>Customers</Badge>
+                <List.Item>Add <Link url={`https://${ getAdminFromShop(shop)}/settings/custom_data`} target="_blank">Metafields</Link> for <Badge tone='info'>Customers</Badge>
                   in type of <Badge>Integer</Badge> and input your Metafield <Badge>Namespace and key</Badge>
                   <TextField
                     label=""
@@ -44,7 +42,7 @@ function FunctionDiscount() {
                   />
                 </List.Item>
                 <List.Item>
-                  Set the Metafields to <Link url={`https://${_getAdminFromShop(shop)}/customers`} target="_blank">Customers</Link> to specify how much discounted they get as a number
+                  Set the Metafields to <Link url={`https://${ getAdminFromShop(shop)}/customers`} target="_blank">Customers</Link> to specify how much discounted they get as a number
                   (e.g. 30 = 30% discounted)
                 </List.Item>
               </List>
@@ -72,7 +70,7 @@ function FunctionDiscount() {
                   <Button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-01/mutations/discountAutomaticAppCreate"
-                    authenticatedFetch(app)(`/functiondiscount?meta=${meta}&id=${id}`).then((response) => {
+                    authenticatedFetch(`/functiondiscount?meta=${meta}&id=${id}`).then((response) => {
                       response.json().then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
@@ -93,7 +91,7 @@ function FunctionDiscount() {
                   <Badge tone='info'>Result: <APIResult res={result} loading={accessing} /></Badge>
                 </List.Item>
                 <List.Item>
-                  Go to <Link url={`https://${_getAdminFromShop(shop)}/discounts`} target="_blank">Discounts</Link> to check if the discount is activated and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to see how your discount works with your specified customers
+                  Go to <Link url={`https://${ getAdminFromShop(shop)}/discounts`} target="_blank">Discounts</Link> to check if the discount is activated and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to see how your discount works with your specified customers
                 </List.Item>
               </List>
             </Layout.Section>

@@ -1,10 +1,11 @@
-import { json, parseRequestBody, renderEmbeddedApp, verifyEmbeddedRequest } from '../lib/http.server.js';
+import { json, parseRequestBody, verifyEmbeddedRequest } from '../lib/http.server.js';
 import { requireAuthenticatedShop } from '../lib/session-token.server.js';
 import {
   callPrivateStorefrontAction,
   prepareStorefrontAccess,
   renderStorefrontPage,
 } from '../lib/storefront.server.js';
+import Storefront from '../pages/Storefront.jsx';
 
 export async function loader({ request }) {
   const url = new URL(request.url);
@@ -40,7 +41,7 @@ export async function loader({ request }) {
 
   const verified = verifyEmbeddedRequest(request);
   if (!verified.ok) return verified.response;
-  return renderEmbeddedApp(request, verified.shop);
+  return null;
 }
 
 export async function action({ request }) {
@@ -58,3 +59,5 @@ export async function action({ request }) {
 
   return json(result);
 }
+
+export default Storefront;

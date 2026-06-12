@@ -1,16 +1,13 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { Redirect } from '../shims/app-bridge-actions';
-import { getSessionToken, authenticatedFetch } from '../shims/app-bridge-utils';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, Button, Badge, BlockStack, List } from '../components/PolarisWeb';
 
-import { _decodeSessionToken, foldLongLine } from "../utils/my_util";
 
 // App Bridge Session Token sample
 // Read https://shopify.dev/apps/auth/oauth/session-tokens
 function SessionToken() {
-  const app = useAppBridge();
-  const redirect = Redirect.create(app);
+  const redirect = createRedirect();
 
   const [raw, setRaw] = useState('');
   const [decoded, setDecoded] = useState('');
@@ -29,9 +26,9 @@ function SessionToken() {
             </Layout.Section>
             <Layout.Section>
               <Button variant="primary" onClick={() => {
-                getSessionToken(app).then((sessionToken) => {
+                getSessionToken().then((sessionToken) => {
                   setRaw(foldLongLine(`${sessionToken}`, 80));
-                  setDecoded(JSON.stringify(_decodeSessionToken(sessionToken), null, 4));
+                  setDecoded(JSON.stringify(decodeSessionToken(sessionToken), null, 4));
                 });
               }}>
                 Show the current session token data
@@ -55,7 +52,7 @@ function SessionToken() {
                 setUrl('');
                 setAuth('');
                 setRes('');
-                authenticatedFetch(app)(`/authenticated`, {
+                authenticatedFetch(`/authenticated`, {
                   /*method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: `{}`*/
@@ -89,21 +86,21 @@ function SessionToken() {
             <Layout.Section>
               <List type="bullet">
                 <List.Item>
-                  If you want to connect to your own service like <Link url={`https://${window.location.hostname}/mocklogin`} target="_blank">this</Link> outside Shopify Admin,
+                  If you want to connect to your own service like <Link url={`https://${getCurrentHost()}/mocklogin`} target="_blank">this</Link> outside Shopify Admin,
                   you can use the session token validation for passing <Badge tone="info">shop</Badge> in a secure way as the following button does.
                 </List.Item>
                 <List.Item>
-                  If you add <Badge>?external=true</Badge> to <Link url="https://shopify.dev/apps/deployment/web#step-5-update-urls-in-the-partner-dashboard" target="_blank">YOUR_APP_URL</Link> (<Badge>https://{window.location.hostname}/?external=true</Badge>),
+                  If you add <Badge>?external=true</Badge> to <Link url="https://shopify.dev/apps/deployment/web#step-5-update-urls-in-the-partner-dashboard" target="_blank">YOUR_APP_URL</Link> (<Badge>https://{getCurrentHost()}/?external=true</Badge>),
                   all pages redirect to the following button target which shows how <b>service connector app install flow</b> works.
                 </List.Item>
               </List>
             </Layout.Section>
             <Layout.Section>
               <Button variant="primary" onClick={() => {
-                getSessionToken(app).then((sessionToken) => {
+                getSessionToken().then((sessionToken) => {
                   // Use the current session token for external site validation for connectihg shops.
                   // Read https://shopify.dev/apps/auth/oauth/session-tokens/getting-started#step-2-authenticate-your-requests
-                  redirect.dispatch(Redirect.Action.REMOTE, { url: `https://${window.location.hostname}/mocklogin?sessiontoken=${sessionToken}`, newContext: true });
+                  redirect.dispatch(RedirectAction.REMOTE, { url: `https://${getCurrentHost()}/mocklogin?sessiontoken=${sessionToken}`, newContext: true });
                 });
               }}>Connect to your service with the session token
               </Button>

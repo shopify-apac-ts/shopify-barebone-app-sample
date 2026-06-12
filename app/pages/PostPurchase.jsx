@@ -1,19 +1,16 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
-import { Redirect } from '../shims/app-bridge-actions';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, List, Badge, Button, Spinner, BlockStack } from '../components/PolarisWeb';
 
-import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 
 // Post-purchase sample
 // Read https://shopify.dev/docs/api/checkout-extensions/extension-points
 // Read https://shopify.dev/docs/apps/checkout/post-purchase/getting-started-post-purchase-extension
 function PostPurchase() {
-  const app = useAppBridge();
-  const redirect = Redirect.create(app);
+  const redirect = createRedirect();
 
-  const shop = _getShopFromQuery(window);
+  const shop = getShopFromLocation();
 
   const [result, setResult] = useState('');
   const [accessing, setAccessing] = useState(false);
@@ -30,7 +27,7 @@ function PostPurchase() {
               <List type="number">
                 <List.Item>
                   <p>
-                    Add the following <Link url={`https://${_getAdminFromShop(shop)}/settings/custom_data`} target="_blank">metafields</Link> used by this post-purchase manually.
+                    Add the following <Link url={`https://${ getAdminFromShop(shop)}/settings/custom_data`} target="_blank">metafields</Link> used by this post-purchase manually.
                   </p>
                   <List type="bullet">
                     <List.Item>
@@ -47,11 +44,11 @@ function PostPurchase() {
                 </List.Item>
                 <List.Item>
                   <p>
-                    Add this app raw URL (<Badge>https://{window.location.hostname}</Badge>) to <Badge tone='info'>Shop</Badge> metafields which is invisible in admin and accessible through this app's API call only.
+                    Add this app raw URL (<Badge>https://{getCurrentHost()}</Badge>) to <Badge tone='info'>Shop</Badge> metafields which is invisible in admin and accessible through this app's API call only.
                   </p>
                   <Button variant="primary" onClick={() => {
                     setAccessing(true);
-                    authenticatedFetch(app)(`/postpurchase`).then((response) => {
+                    authenticatedFetch(`/postpurchase`).then((response) => {
                       response.json().then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
@@ -73,13 +70,13 @@ function PostPurchase() {
                 </List.Item>
                 <List.Item>
                   <p>
-                    Set each <Badge>product id (the last number of its detail page URL)</Badge> to each <Badge>barebone_app_upsell.product_id</Badge> of <Link url={`https://${_getAdminFromShop(shop)}/products`} target="_blank">products</Link> for
+                    Set each <Badge>product id (the last number of its detail page URL)</Badge> to each <Badge>barebone_app_upsell.product_id</Badge> of <Link url={`https://${ getAdminFromShop(shop)}/products`} target="_blank">products</Link> for
                     those you want to upsell (e.g. purchasing a product A with a product B's id offers a B in the post-purchase).
                   </p>
                 </List.Item>
                 <List.Item>
                   <p>
-                    Select this app in <Badge tone='info'>Post-purchase page</Badge> of <Link url={`https://${_getAdminFromShop(shop)}/settings/checkout`} target="_blank">checkout settings</Link> to enable this Post-purchase.
+                    Select this app in <Badge tone='info'>Post-purchase page</Badge> of <Link url={`https://${ getAdminFromShop(shop)}/settings/checkout`} target="_blank">checkout settings</Link> to enable this Post-purchase.
                   </p>
                 </List.Item>
               </List>
@@ -102,17 +99,17 @@ function PostPurchase() {
                 </List.Item>
                 <List.Item>
                   <p>
-                    You can check the post purchases in <Link url={`https://${_getAdminFromShop(shop)}/orders`} target="_blank">orders </Link> with each detail page (you'll see appended items and transactions there).
+                    You can check the post purchases in <Link url={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">orders </Link> with each detail page (you'll see appended items and transactions there).
                   </p>
                   <p>
-                    Also, you can check the review score of each buyer in <Badge>barebone_app_review.score</Badge> metafield of <Link url={`https://${_getAdminFromShop(shop)}/customers`} target="_blank">customers</Link>.
+                    Also, you can check the review score of each buyer in <Badge>barebone_app_review.score</Badge> metafield of <Link url={`https://${ getAdminFromShop(shop)}/customers`} target="_blank">customers</Link>.
                   </p>
                 </List.Item>
               </List>
             </Layout.Section>
             <Layout.Section>
               <p>
-                <b>TIPS: </b>This post-purchase communicates with the app raw endpoint over <Link url={`https://shopify.dev/docs/api/checkout-extensions/extension-points#web-platform-globals`} target="_blank">CORS</Link> with a <Link url={`https://shopify.dev/docs/api/checkout-extensions/post-purchase/jwt-specification`} target='_blank'>token</Link> for sensitive data like shop and customer ids as <Link onClick={() => { redirect.dispatch(Redirect.Action.APP, '/sessiontoken'); }}>
+                <b>TIPS: </b>This post-purchase communicates with the app raw endpoint over <Link url={`https://shopify.dev/docs/api/checkout-extensions/extension-points#web-platform-globals`} target="_blank">CORS</Link> with a <Link url={`https://shopify.dev/docs/api/checkout-extensions/post-purchase/jwt-specification`} target='_blank'>token</Link> for sensitive data like shop and customer ids as <Link onClick={() => { redirect.dispatch(RedirectAction.APP, '/sessiontoken'); }}>
                   Session Token sample
                 </Link> does. For security considerations, check <Link url={`https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#network-access`} target='_blank'>this page</Link>, too.
               </p>

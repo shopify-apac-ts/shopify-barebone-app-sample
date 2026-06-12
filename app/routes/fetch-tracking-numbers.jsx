@@ -1,4 +1,4 @@
-import { trackingNumbers } from '../lib/legacy-routes.server.js';
+import { trackingNumbers } from '../lib/public-endpoints.server.js';
 
 export async function loader({ request }) {
   return trackingNumbers(request);

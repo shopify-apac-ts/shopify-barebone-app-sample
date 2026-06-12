@@ -1,19 +1,16 @@
-import { useAppBridge } from '../shims/app-bridge-react';
-import { Redirect } from '../shims/app-bridge-actions';
-import { getSessionToken } from "../shims/app-bridge-utils";
 import { Page, Card, ResourceList, Icon, Text } from '../components/PolarisWeb';
-import { CircleRightIcon } from '../shims/polaris-icons';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 
 // Index for all sample UIs using ResourceList as a link list.
 // Read https://polaris.shopify.com/components/resource-list
 function Index() {
-    const app = useAppBridge();
-    const redirect = Redirect.create(app);
+    const redirect = createRedirect();
 
     // Redirect to the external mock service login to connect the current shop and their users by Session Token validation.
-    if (new URLSearchParams(window.location.search).get("external") != null) {
-        getSessionToken(app).then((sessionToken) => {
-            redirect.dispatch(Redirect.Action.REMOTE, `https://${window.location.hostname}/mocklogin?sessiontoken=${sessionToken}`);
+    if (getQueryParam("external") != null) {
+        getSessionToken().then((sessionToken) => {
+            redirect.dispatch(RedirectAction.REMOTE, `https://${getCurrentHost()}/mocklogin?sessiontoken=${sessionToken}`);
         });
         return (<span></span>);
     }
@@ -30,7 +27,7 @@ function Index() {
                                 // Read https://shopify.dev/apps/tools/app-bridge/actions/navigation/redirect-navigate
                                 // 'url' = simple link doesn't work due to lack of the right hmac signature.
                                 // App Bridge redirect embeds it. 
-                                redirect.dispatch(Redirect.Action.APP, '/sessiontoken');
+                                redirect.dispatch(RedirectAction.APP, '/sessiontoken');
                             },
                             name: 'Session Token',
                             location: 'Session Token sameple with App Bridge for authentication and external site validation',
@@ -38,7 +35,7 @@ function Index() {
                         {
                             id: 2,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/adminlink');
+                                redirect.dispatch(RedirectAction.APP, '/adminlink');
                             },
                             name: 'Admin Link',
                             location: 'Admin Link sample with embedded / unnembedded handling',
@@ -46,7 +43,7 @@ function Index() {
                         {
                             id: 3,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/themeapp');
+                                redirect.dispatch(RedirectAction.APP, '/themeapp');
                             },
                             name: 'Theme App Extension',
                             location: 'Theme App Extension with App Proxies use cases',
@@ -54,7 +51,7 @@ function Index() {
                         {
                             id: 4,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/functiondiscount');
+                                redirect.dispatch(RedirectAction.APP, '/functiondiscount');
                             },
                             name: 'Function Discount',
                             location: 'Function implementation for discounts based on customer matafields',
@@ -62,7 +59,7 @@ function Index() {
                         {
                             id: 5,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/functionshipping');
+                                redirect.dispatch(RedirectAction.APP, '/functionshipping');
                             },
                             name: 'Function Shipping',
                             location: 'Function implementation for shipping rates based on delivery address zip code',
@@ -70,7 +67,7 @@ function Index() {
                         {
                             id: 6,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/functionpayment');
+                                redirect.dispatch(RedirectAction.APP, '/functionpayment');
                             },
                             name: 'Function Payment',
                             location: 'Function implementation for payment methods based on selected delivery options',
@@ -78,7 +75,7 @@ function Index() {
                         {
                             id: 7,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/webpixel');
+                                redirect.dispatch(RedirectAction.APP, '/webpixel');
                             },
                             name: 'Web Pixel',
                             location: 'Web Pixel sameple for GA4 integration',
@@ -86,7 +83,7 @@ function Index() {
                         {
                             id: 8,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/postpurchase');
+                                redirect.dispatch(RedirectAction.APP, '/postpurchase');
                             },
                             name: 'Post-purchase',
                             location: 'Post-purchase sample for upselling products and getting shop review scores with metafields',
@@ -94,7 +91,7 @@ function Index() {
                         {
                             id: 9,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/checkoutui');
+                                redirect.dispatch(RedirectAction.APP, '/checkoutui');
                             },
                             name: 'Checkout UI',
                             location: 'Checkout UI sample with upsell and shop reviews shared with post-purchase server side, and IP address blocking',
@@ -102,7 +99,7 @@ function Index() {
                         {
                             id: 10,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/ordermanage');
+                                redirect.dispatch(RedirectAction.APP, '/ordermanage');
                             },
                             name: 'Order Management',
                             location: 'Order management sameple for fulfillments, transactions and fulfillment services with inventory management',
@@ -110,7 +107,7 @@ function Index() {
                         {
                             id: 12,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/bulkoperation');
+                                redirect.dispatch(RedirectAction.APP, '/bulkoperation');
                             },
                             name: 'Bulk Operation',
                             location: 'Bulk Operation sample for product importing with file uploading',
@@ -118,7 +115,7 @@ function Index() {
                         {
                             id: 13,
                             onClick: (id) => {
-                                redirect.dispatch(Redirect.Action.APP, '/storefront');
+                                redirect.dispatch(RedirectAction.APP, '/storefront');
                             },
                             name: 'Storefront API',
                             location: 'Storefront API sample with public and private (delegated) tokens in a plain custom storefront',
@@ -126,7 +123,7 @@ function Index() {
                     ]}
                     renderItem={(item) => {
                         const { id, onClick, name, location } = item;
-                        const media = <Icon source={CircleRightIcon} />;
+                        const media = <Icon />;
                         return (
                             <ResourceList.Item id={id} onClick={onClick} media={media} >
                                 <Text variant="bodyMd" fontWeight="bold" as="h3">

@@ -1,38 +1,37 @@
-import { useState } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { Redirect } from '../shims/app-bridge-actions';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { useEffect, useState } from 'react';
+import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
+import { getAdminFromShop, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, Badge, Text, Spinner, List, BlockStack } from '../components/PolarisWeb';
 
-import { _decodeSessionToken, _getAdminFromShop, _getShopFromQuery } from "../utils/my_util";
 
 // Admin link sample with App Bridge redirection
 // Read https://shopify.dev/apps/tools/app-bridge/getting-started/app-setup
 // Read https://shopify.dev/apps/app-extensions/getting-started#add-an-admin-link
 function AdminLink() {
-    const app = useAppBridge();
-    const redirect = Redirect.create(app);
+    const redirect = createRedirect();
 
     // Raw endpoint of this menu
-    const rawUrl = `${window.location.href.split('?')[0]}`;
+    const rawUrl = getCurrentUrlWithoutQuery();
 
-    const shop = _getShopFromQuery(window);
+    const shop = getShopFromLocation();
 
     // This query parameter is supposed to be given by Admin Link extensions.
-    const id = new URLSearchParams(window.location.search).get("id");
+    const id = getQueryParam("id");
     // Supposed to be shown from the linked page like a order details.
     if (id != null) {
         const [res, setRes] = useState('');
 
-        authenticatedFetch(app)(`/adminlink?id=${id}`).then((response) => {
-            response.json().then((json) => {
-                console.log(JSON.stringify(json, null, 4));
-                setRes(JSON.stringify(json.result, null, 4));
-            }).catch((e) => {
-                console.log(`${e}`);
-                setRes(``);
+        useEffect(() => {
+            authenticatedFetch(`/adminlink?id=${id}`).then((response) => {
+                response.json().then((json) => {
+                    console.log(JSON.stringify(json, null, 4));
+                    setRes(JSON.stringify(json.result, null, 4));
+                }).catch((e) => {
+                    console.log(`${e}`);
+                    setRes(``);
+                });
             });
-        });
+        }, [id]);
 
         return (
             <Page title="You seem to have come through Admin Link!">
@@ -40,7 +39,7 @@ function AdminLink() {
                     <Layout.Section>
                         <Text as='h2'>Your selected data id: <Badge tone='info'>{id}</Badge></Text>
                         <Text>
-                            <Link onClick={() => { redirect.dispatch(Redirect.Action.APP, '/adminlink'); }}>
+                            <Link onClick={() => { redirect.dispatch(RedirectAction.APP, '/adminlink'); }}>
                                 Go back
                             </Link>
                         </Text>
@@ -76,7 +75,7 @@ function AdminLink() {
                     <List type="bullet">
                         <List.Item>
                             Check if <Badge>app://adminlink</Badge> is added in the admin extension link setting in <Badge>extensions/my-admin-link-product-details/shopify.extension.toml</Badge> file 
-                            for <Link url={`https://${_getAdminFromShop(shop)}/products`} target="_blank">product details</Link>.
+                            for <Link url={`https://${ getAdminFromShop(shop)}/products`} target="_blank">product details</Link>.
                         </List.Item>
                         <List.Item>
                             Once you click your extension label in <Badge tone="info">More actions</Badge> in your selected product details, this page shows up again in a diffrent UI checking if the <Badge tone="info">id</Badge> parameter is given or not.

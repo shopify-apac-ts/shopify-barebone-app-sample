@@ -1,4 +1,6 @@
-import { createFunctionDiscount, embeddedPageLoader } from '../lib/legacy-routes.server.js';
+import { embeddedPageLoader } from '../lib/embedded.server.js';
+import { createFunctionDiscount } from '../lib/functions-samples.server.js';
+import FunctionDiscount from '../pages/FunctionDiscount.jsx';
 
 export async function loader({ request }) {
   return embeddedPageLoader({
@@ -7,3 +9,5 @@ export async function loader({ request }) {
     handler: createFunctionDiscount,
   });
 }
+
+export default FunctionDiscount;

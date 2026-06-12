@@ -1,4 +1,6 @@
-import { createDeliveryCustomization, embeddedPageLoader } from '../lib/legacy-routes.server.js';
+import { embeddedPageLoader } from '../lib/embedded.server.js';
+import { createDeliveryCustomization } from '../lib/functions-samples.server.js';
+import FunctionShipping from '../pages/FunctionShipping.jsx';
 
 export async function loader({ request }) {
   return embeddedPageLoader({
@@ -7,3 +9,5 @@ export async function loader({ request }) {
     handler: createDeliveryCustomization,
   });
 }
+
+export default FunctionShipping;

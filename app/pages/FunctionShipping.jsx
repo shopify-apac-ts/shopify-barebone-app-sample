@@ -1,18 +1,16 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, List, Badge, TextField, Button, Spinner, BlockStack } from '../components/PolarisWeb';
 
-import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 
 // Shopify Functions for shipping method sample
 // Read https://shopify.dev/apps/checkout/delivery-customizations
 // This sample doesn't use Shopify given libraries for the app UX, create an extention manually. 
 // Read https://shopify.dev/api/functions/reference/delivery-customization
 function FunctionShipping() {
-  const app = useAppBridge();
 
-  const shop = _getShopFromQuery(window);
+  const shop = getShopFromLocation();
 
   const [rate, setRate] = useState('Standard');
   const rateChange = useCallback((newRate) => setRate(newRate), []);
@@ -36,7 +34,7 @@ function FunctionShipping() {
             </Layout.Section>
             <Layout.Section>
               <List type="number">
-                <List.Item>Input a <Badge>shipping rate name</Badge> which you want to show only, from <Link url={`https://${_getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</Link>.
+                <List.Item>Input a <Badge>shipping rate name</Badge> which you want to show only, from <Link url={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</Link>.
                   <TextField
                     label=""
                     value={rate}
@@ -79,7 +77,7 @@ function FunctionShipping() {
                   <Button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/deliveryCustomizationCreate"
-                    authenticatedFetch(app)(`/functionshipping?rate=${rate}&zip=${zip}&id=${id}`).then((response) => {
+                    authenticatedFetch(`/functionshipping?rate=${rate}&zip=${zip}&id=${id}`).then((response) => {
                       response.json().then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
@@ -100,7 +98,7 @@ function FunctionShipping() {
                   <Badge tone='info'>Result: <APIResult res={result} loading={accessing} /></Badge>
                 </List.Item>
                 <List.Item>
-                  Go to <Link url={`https://${_getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</Link> to check if the customization is created and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to see how your customization works with your input zip code.
+                  Go to <Link url={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</Link> to check if the customization is created and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to see how your customization works with your input zip code.
                 </List.Item>
               </List>
             </Layout.Section>

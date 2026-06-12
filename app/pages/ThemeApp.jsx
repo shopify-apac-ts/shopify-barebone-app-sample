@@ -1,18 +1,16 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { Redirect } from '../shims/app-bridge-actions';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, Badge, List, Button, TextField, BlockStack } from '../components/PolarisWeb';
 
-import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 
 // Theme App Extension sample with App Proxies
 // Read https://shopify.dev/apps/online-store/theme-app-extensions
 // Read https://shopify.dev/apps/online-store/app-proxies
 function ThemeApp() {
-    const app = useAppBridge();
-    const redirect = Redirect.create(app);
+    const redirect = createRedirect();
 
-    const shop = _getShopFromQuery(window);
+    const shop = getShopFromLocation();
 
     return (
         <Page title="Theme App Extension usage of Schema, Metafields and App Proxies for server communication">
@@ -29,7 +27,7 @@ function ThemeApp() {
                                         // Read https://shopify.dev/apps/online-store/theme-app-extensions/extensions-framework#simplified-installation-flow-with-deep-linking
                                         const path = `/themes/current/editor?context=apps&activateAppId=${API_KEY}/app-embed-block`;
                                         console.log(path);
-                                        redirect.dispatch(Redirect.Action.ADMIN_PATH, {
+                                        redirect.dispatch(RedirectAction.ADMIN_PATH, {
                                             path: path,
                                             newContext: true
                                         });
@@ -38,10 +36,10 @@ function ThemeApp() {
                                     </Button> with <Link url={`https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration#deep-linking`} target="_blank">deep link</Link>
 
                                 </List.Item>
-                                <List.Item>Add <Link url={`https://${_getAdminFromShop(shop)}/settings/custom_data`} target="_blank">Metafields</Link> for <Badge tone='info'>Products</Badge>
+                                <List.Item>Add <Link url={`https://${ getAdminFromShop(shop)}/settings/custom_data`} target="_blank">Metafields</Link> for <Badge tone='info'>Products</Badge>
                                     in type of <Badge>Product</Badge> and <Badge>Single line text</Badge> and go to the app block section in the theme editor ('Home page' and 'Default product') to set the metafields above with
                                     <Link url={`https://help.shopify.com/en/manual/online-store/themes/theme-structure/sections-and-blocks`} target="_blank">Dynamic sources</Link>
-                                    (don't forget to set Metafields to <Link url={`https://${_getAdminFromShop(shop)}/products`} target="_blank">Products</Link>)
+                                    (don't forget to set Metafields to <Link url={`https://${ getAdminFromShop(shop)}/products`} target="_blank">Products</Link>)
                                 </List.Item>
                             </List>
                         </Layout.Section>
@@ -55,7 +53,7 @@ function ThemeApp() {
                         <Layout.Section>
                             <List type="number">
                                 <List.Item>
-                                    Subpath prefix: <Badge>apps</Badge> Subpath: <Badge>bareboneproxy</Badge> Proxy URL: <Badge>https://{window.location.hostname}/appproxy</Badge>
+                                    Subpath prefix: <Badge>apps</Badge> Subpath: <Badge>bareboneproxy</Badge> Proxy URL: <Badge>https://{getCurrentHost()}/appproxy</Badge>
                                 </List.Item>
                                 <List.Item>
                                     <Link url={`https://${shop}/apps/bareboneproxy?your_param=your_value`} target="_blank">Test your proxy</Link>

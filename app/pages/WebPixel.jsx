@@ -1,17 +1,15 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, List, Badge, Checkbox, TextField, Button, Spinner, BlockStack } from '../components/PolarisWeb';
 
-import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 
 // Web Pixel sample
 // Read https://shopify.dev/api/pixels
 // Read https://shopify.dev/apps/marketing/pixels/getting-started
 function WebPixel() {
-  const app = useAppBridge();
 
-  const shop = _getShopFromQuery(window);
+  const shop = getShopFromLocation();
 
   const [ga4Id, setGA4Id] = useState('');
   const ga4IdChange = useCallback((newGA4Id) => setGA4Id(newGA4Id), []);
@@ -39,7 +37,7 @@ function WebPixel() {
                     to send checkout events like <Badge tone="info">checkout_started</Badge> within Web Pixel <Link url="https://www.w3schools.com/html/html5_webworkers.asp" target="_blank">Web Workers</Link> which cannot be done by
                     Theme App Extention or manual insertion of <Badge>header GA Tag</Badge>.
                     Other events outside checkouts like page views, adding to carts can be sent by the GA tag insertion automatically which can be tested by
-                    <Link url={`https://${_getAdminFromShop(shop)}/themes/current/editor?context=apps`} target="_blank">the app embed block named 'Barebone App Embed TP' of this app</Link>.
+                    <Link url={`https://${ getAdminFromShop(shop)}/themes/current/editor?context=apps`} target="_blank">the app embed block named 'Barebone App Embed TP' of this app</Link>.
                   </p>
                   <BlockStack gap="500">
                     <TextField
@@ -70,7 +68,7 @@ function WebPixel() {
                   <Button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/webPixelCreate"
-                    authenticatedFetch(app)(`/webpixel?ga4Id=${ga4Id}&ga4Sec=${ga4Sec}&ga4Debug=${ga4Debug}`).then((response) => {
+                    authenticatedFetch(`/webpixel?ga4Id=${ga4Id}&ga4Sec=${ga4Sec}&ga4Debug=${ga4Debug}`).then((response) => {
                       response.json().then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
@@ -91,8 +89,8 @@ function WebPixel() {
                   <Badge tone='info'>Result: <APIResult res={result} loading={accessing} /></Badge>
                 </List.Item>
                 <List.Item>
-                  Go to <Link url={`https://${_getAdminFromShop(shop)}/settings/customer_events`} target="_blank">customer events</Link> to check if the app pixel is created and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> with
-                  <Badge>Developer Console</Badge> on to see which event triggered by Web Pixel. If you add <Link url={`https://${_getAdminFromShop(shop)}/themes/current/editor`} target="_blank">the app block named 'Barebone App Block TP' of this app</Link> to your theme app sections,
+                  Go to <Link url={`https://${ getAdminFromShop(shop)}/settings/customer_events`} target="_blank">customer events</Link> to check if the app pixel is created and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> with
+                  <Badge>Developer Console</Badge> on to see which event triggered by Web Pixel. If you add <Link url={`https://${ getAdminFromShop(shop)}/themes/current/editor`} target="_blank">the app block named 'Barebone App Block TP' of this app</Link> to your theme app sections,
                   you can see <Badge>your own custom event</Badge> triggered in the pages you add the section, too.
                 </List.Item>
               </List>

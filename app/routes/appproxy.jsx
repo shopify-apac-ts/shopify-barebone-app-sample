@@ -1,4 +1,4 @@
-import { appProxy } from '../lib/legacy-routes.server.js';
+import { appProxy } from '../lib/public-endpoints.server.js';
 import { parseRequestBody } from '../lib/http.server.js';
 
 export async function loader({ request }) {

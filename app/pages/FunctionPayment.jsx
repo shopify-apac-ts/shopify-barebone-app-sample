@@ -1,18 +1,16 @@
 import { useState, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, List, Badge, TextField, Button, Spinner, BlockStack } from '../components/PolarisWeb';
 
-import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 
 // Shopify Functions for payment method sample
 // Read https://shopify.dev/apps/checkout/payment-customizations
 // This sample doesn't use Shopify given libraries for the app UX, create an extention manually. 
 // Read https://shopify.dev/api/functions/reference/payment-customization
 function FunctionPayment() {
-  const app = useAppBridge();
 
-  const shop = _getShopFromQuery(window);
+  const shop = getShopFromLocation();
 
   const [method, setMethod] = useState('Cash on Delivery (COD)');
   const methodChange = useCallback((newMethod) => setMethod(newMethod), []);
@@ -45,7 +43,7 @@ function FunctionPayment() {
                     placeholder="Example: Cash on Delivery (COD)"
                   />
                 </List.Item>
-                <List.Item>Input a <Badge>shipping rate name</Badge> which buyers select when the payment method shows up above, from <Link url={`https://${_getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</Link> or <Link url={`https://${_getAdminFromShop(shop)}/orders`} target="_blank">past orders</Link>
+                <List.Item>Input a <Badge>shipping rate name</Badge> which buyers select when the payment method shows up above, from <Link url={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</Link> or <Link url={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">past orders</Link>
                   <TextField
                     label=""
                     value={rate}
@@ -79,7 +77,7 @@ function FunctionPayment() {
                   <Button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/paymentCustomizationCreate"
-                    authenticatedFetch(app)(`/functionpayment?method=${method}&rate=${rate}&id=${id}`).then((response) => {
+                    authenticatedFetch(`/functionpayment?method=${method}&rate=${rate}&id=${id}`).then((response) => {
                       response.json().then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
@@ -100,7 +98,7 @@ function FunctionPayment() {
                   <Badge tone='info'>Result: <APIResult res={result} loading={accessing} /></Badge>
                 </List.Item>
                 <List.Item>
-                  Go to <Link url={`https://${_getAdminFromShop(shop)}/settings/payments`} target="_blank">payment settings</Link> to check if the customization is created and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to see how your customization works with your selected shipping rate.
+                  Go to <Link url={`https://${ getAdminFromShop(shop)}/settings/payments`} target="_blank">payment settings</Link> to check if the customization is created and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to see how your customization works with your selected shipping rate.
                 </List.Item>
               </List>
             </Layout.Section>

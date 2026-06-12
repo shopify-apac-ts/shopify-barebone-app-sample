@@ -1,20 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { Redirect } from '../shims/app-bridge-actions';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, Badge, Text, Spinner, List, BlockStack, Button, Select, TextField } from '../components/PolarisWeb';
 
-import { _decodeSessionToken, _getAdminFromShop, _getShopFromQuery } from "../utils/my_util";
 
 // Order management sample for fulfillment, inventory, and fulfillment services with inventory management.
 // Read https://shopify.dev/docs/apps/fulfillment
 function OrderManage() {
-    const app = useAppBridge();
-    const redirect = Redirect.create(app);
+    const redirect = createRedirect();
 
-    const rawUrl = `${window.location.href.split('?')[0]}`;
+    const rawUrl = getCurrentUrlWithoutQuery();
 
-    const shop = _getShopFromQuery(window);
+    const shop = getShopFromLocation();
 
     const [result, setResult] = useState('');
     const [accessing, setAccessing] = useState(false);
@@ -32,14 +29,14 @@ function OrderManage() {
 
     const [link, setLink] = useState('');
 
-    const id = new URLSearchParams(window.location.search).get("id");
+    const id = getQueryParam("id");
     if (id != null) {
         const [res, setRes] = useState('');
         const [foIds, setFoIds] = useState([]);
         const [trans, setTrans] = useState([]);
 
         useEffect(() => {
-            authenticatedFetch(app)(`/ordermanage?id=${id}`).then((response) => {
+            authenticatedFetch(`/ordermanage?id=${id}`).then((response) => {
                 response.json().then((json) => {
                     console.log(JSON.stringify(json, null, 4));
                     setRes(JSON.stringify(json, null, 4));
@@ -60,9 +57,9 @@ function OrderManage() {
                         <Link url="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/orderCapture" target="_blank">Dev. doc (2)</Link>
                     </Layout.Section>
                     <Layout.Section>
-                        <Text as='h2'>Your selected data id: <Badge tone='info'><Link url={`https://${_getAdminFromShop(shop)}/orders/${id}`} target="_blank">{id}</Link></Badge></Text>
+                        <Text as='h2'>Your selected data id: <Badge tone='info'><Link url={`https://${ getAdminFromShop(shop)}/orders/${id}`} target="_blank">{id}</Link></Badge></Text>
                         <Text>
-                            <Link onClick={() => { redirect.dispatch(Redirect.Action.APP, '/ordermanage'); }}>
+                            <Link onClick={() => { redirect.dispatch(RedirectAction.APP, '/ordermanage'); }}>
                                 Go back
                             </Link>
                         </Text>
@@ -75,7 +72,7 @@ function OrderManage() {
                     <Layout.Section>
                         <Button variant="primary" onClick={() => {
                             setRes(``);
-                            authenticatedFetch(app)(`/ordermanage?id=${id}&foids=${foIds}`).then((response) => {
+                            authenticatedFetch(`/ordermanage?id=${id}&foids=${foIds}`).then((response) => {
                                 response.json().then((json) => {
                                     console.log(JSON.stringify(json, null, 4));
                                     setRes(JSON.stringify(json, null, 4));
@@ -90,7 +87,7 @@ function OrderManage() {
                     <Layout.Section>
                         <Button variant="primary" onClick={() => {
                             setRes(``);
-                            authenticatedFetch(app)(`/ordermanage?id=${id}&trans=${trans}`).then((response) => {
+                            authenticatedFetch(`/ordermanage?id=${id}&trans=${trans}`).then((response) => {
                                 response.json().then((json) => {
                                     console.log(JSON.stringify(json, null, 4));
                                     setRes(JSON.stringify(json, null, 4));
@@ -116,7 +113,7 @@ function OrderManage() {
                     <List type="number">
                         <List.Item>
                             Check if <Badge>app://ordermanage</Badge> is added in the admin link extension setting in <Badge>extensions/my-admin-link-order-details/shopify.extension.toml</Badge> file 
-                            for <Link url={`https://${_getAdminFromShop(shop)}/orders`} target="_blank">order details</Link>.
+                            for <Link url={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">order details</Link>.
                         </List.Item>
                         <List.Item>
                             Once you click your extension label in <Badge tone="info">More actions</Badge> in your selected order details, this page shows up again in a diffrent UI for <Badge>fulfillment / capture</Badge>, checking if the <Badge tone="info">id</Badge> parameter is given or not.
@@ -137,7 +134,7 @@ function OrderManage() {
                         <List.Item>
                             <Button variant="primary" onClick={() => {
                                 setAccessing(true);
-                                authenticatedFetch(app)(`/ordermanage?fs=${true}`).then((response) => {
+                                authenticatedFetch(`/ordermanage?fs=${true}`).then((response) => {
                                     response.json().then((json) => {
                                         console.log(JSON.stringify(json, null, 4));
                                         setAccessing(false);
@@ -156,8 +153,8 @@ function OrderManage() {
                             <Badge tone='info'>Result: <APIResult2 res={result} loading={accessing} /></Badge>
                         </List.Item>
                         <List.Item>
-                            Make sure <Badge>Barebone app fulfillment service</Badge> is registed to <Badge tone='info'>App locations</Badge> in <Link url={`https://${_getAdminFromShop(shop)}/settings/locations`} target="_blank">location settings</Link>.
-                            Go to <Link url={`https://${_getAdminFromShop(shop)}/products`} target="_blank">product details</Link> to check <Badge>Barebone app fulfillment service</Badge> in <Badge tone='info'>[Inventory] &gt; [Edit locations]</Badge> in your selected product page
+                            Make sure <Badge>Barebone app fulfillment service</Badge> is registed to <Badge tone='info'>App locations</Badge> in <Link url={`https://${ getAdminFromShop(shop)}/settings/locations`} target="_blank">location settings</Link>.
+                            Go to <Link url={`https://${ getAdminFromShop(shop)}/products`} target="_blank">product details</Link> to check <Badge>Barebone app fulfillment service</Badge> in <Badge tone='info'>[Inventory] &gt; [Edit locations]</Badge> in your selected product page
                             (If you have inventories in <b>other locations</b> for the product, <b>set zero</b> to use this app location for online checkout).
                         </List.Item>
                         <List.Item>
@@ -215,13 +212,13 @@ function OrderManage() {
                             <br />
                             <Button variant="primary" onClick={() => {
                                 setAccessing2(true);
-                                authenticatedFetch(app)(`/ordermanage?delta=${delta}&name=${name}&reason=${reason}&uri=${uri}`).then((response) => {
+                                authenticatedFetch(`/ordermanage?delta=${delta}&name=${name}&reason=${reason}&uri=${uri}`).then((response) => {
                                     response.json().then((json) => {
                                         console.log(JSON.stringify(json, null, 4));
                                         setAccessing2(false);
                                         if (json.error === '') {
                                             setResult2('Success!');
-                                            setLink(`https://${_getAdminFromShop(shop)}/products/inventory?location_id=${json.response.fulfillmentService.location.id.replace('gid://shopify/Location/', '')}`);
+                                            setLink(`https://${ getAdminFromShop(shop)}/products/inventory?location_id=${json.response.fulfillmentService.location.id.replace('gid://shopify/Location/', '')}`);
                                         } else {
                                             setResult2(`Error! ${JSON.stringify(json.error)}`);
                                             setLink('');
@@ -239,7 +236,7 @@ function OrderManage() {
                             <InventoryLink link={link}></InventoryLink>
                         </List.Item>
                         <List.Item>
-                            After you make a order of the procuct above through <Link url={`https://${shop}`} target="_blank">the storefront</Link> and go to <Link url={`https://${_getAdminFromShop(shop)}/orders`} target="_blank">the order page</Link>, you see the new button labeled <Badge tone='info'>Request fulfillments</Badge>. Once you click the button, you see <Badge>{`{"kind":"FULFILLMENT_REQUEST"}`}</Badge>
+                            After you make a order of the procuct above through <Link url={`https://${shop}`} target="_blank">the storefront</Link> and go to <Link url={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">the order page</Link>, you see the new button labeled <Badge tone='info'>Request fulfillments</Badge>. Once you click the button, you see <Badge>{`{"kind":"FULFILLMENT_REQUEST"}`}</Badge>
                             in your server log as accessing <Badge>/fulfillment_order_notification</Badge>.
                         </List.Item>
                         <List.Item>

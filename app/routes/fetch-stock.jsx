@@ -1,4 +1,4 @@
-import { stockLevels } from '../lib/legacy-routes.server.js';
+import { stockLevels } from '../lib/public-endpoints.server.js';
 
 export async function loader({ request }) {
   return stockLevels(request);

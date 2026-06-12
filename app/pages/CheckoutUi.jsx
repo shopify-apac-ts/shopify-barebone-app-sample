@@ -1,8 +1,7 @@
-import { useAppBridge } from '../shims/app-bridge-react';
-import { Redirect } from '../shims/app-bridge-actions';
 import { Page, Card, Layout, Link, List, Badge, BlockStack } from '../components/PolarisWeb';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 
-import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 
 // Checkout UI sample
 // Read https://shopify.dev/docs/api/checkout-ui-extensions
@@ -10,10 +9,9 @@ import { _getShopFromQuery, _getAdminFromShop } from "../utils/my_util";
 // Read https://shopify.dev/docs/apps/checkout/product-offers
 // Read https://shopify.dev/docs/api/checkout-ui-extensions/components
 function CheckoutUi() {
-  const app = useAppBridge();
-  const redirect = Redirect.create(app);
+  const redirect = createRedirect();
 
-  const shop = _getShopFromQuery(window);
+  const shop = getShopFromLocation();
 
   return (
     <Page title="Checkout UI sample for upselling / store review / IP address blocking">
@@ -28,14 +26,14 @@ function CheckoutUi() {
                 <List.Item>
                   <p>
                     Go to <Link onClick={() => {
-                      redirect.dispatch(Redirect.Action.APP, '/postpurchase');
+                      redirect.dispatch(RedirectAction.APP, '/postpurchase');
                     }}>Post-purchase sample</Link> to <b>add all used metafields and set the values</b>.
                   </p>
                 </List.Item>
                 <List.Item>
                   <p>
                     Add <b>three instances of this app</b> in the locations of <Badge tone='info'>'<b>purchase.checkout.block.render</b>' = Dynamic / '<b>purchase.checkout.contact.render-after</b>' = Static /
-                      '<b>purchase.checkout.actions.render-before</b>' = Static</Badge> in <Link url={`https://${_getAdminFromShop(shop)}/settings/checkout/editor`} target="_blank">checkout editor</Link>, seeing <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/extension-points-overview" target="_blank">this dev. page</Link> and set the IP address to <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#block-progress" target="_blank">block</Link> in their settings. You can check your IP address in external sites
+                      '<b>purchase.checkout.actions.render-before</b>' = Static</Badge> in <Link url={`https://${ getAdminFromShop(shop)}/settings/checkout/editor`} target="_blank">checkout editor</Link>, seeing <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/extension-points-overview" target="_blank">this dev. page</Link> and set the IP address to <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#block-progress" target="_blank">block</Link> in their settings. You can check your IP address in external sites
                     like <Link url="https://whatismyipaddress.com/" target="_blank">this</Link>.
                   </p>
                 </List.Item>
@@ -57,10 +55,10 @@ function CheckoutUi() {
                 </List.Item>
                 <List.Item>
                   <p>
-                    You can check the upsell products in <Link url={`https://${_getAdminFromShop(shop)}/orders`} target="_blank">orders </Link> with detailed info.
+                    You can check the upsell products in <Link url={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">orders </Link> with detailed info.
                   </p>
                   <p>
-                    Also, you can check the review score of each buyer in <Badge>barebone_app_review.score</Badge> metafield of <Link url={`https://${_getAdminFromShop(shop)}/customers`} target="_blank">customers</Link>.
+                    Also, you can check the review score of each buyer in <Badge>barebone_app_review.score</Badge> metafield of <Link url={`https://${ getAdminFromShop(shop)}/customers`} target="_blank">customers</Link>.
                   </p>
                 </List.Item>
               </List>
@@ -68,7 +66,7 @@ function CheckoutUi() {
             <Layout.Section>
               <p>
                 <b>TIPS: </b>This extension uses its own provided <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#api-access" target="_blank">Storefront API calls</Link> and app <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#network-access" target="_blank">server side access</Link> shared with <Link onClick={() => {
-                  redirect.dispatch(Redirect.Action.APP, '/postpurchase');
+                  redirect.dispatch(RedirectAction.APP, '/postpurchase');
                 }}>Post-purchase sample</Link> wtih <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/unstable/targets/block/purchase-thank-you-block-render#standardapi-propertydetail-sessiontoken" target="_blank">session tokens</Link>.
               </p>
             </Layout.Section>

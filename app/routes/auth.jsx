@@ -1,10 +1,11 @@
 import { API_KEY } from '../lib/env.server.js';
-import { renderEmbeddedApp, redirect, verifyEmbeddedRequest } from '../lib/http.server.js';
+import { redirect, verifyEmbeddedRequest } from '../lib/http.server.js';
 import {
   createAppJwt,
   isEmbedded,
 } from '../lib/shopify-auth.server.js';
 import { hasValidInstallation } from '../lib/oauth.server.js';
+import Index from '../pages/Index.jsx';
 
 export async function loader({ request }) {
   const verified = verifyEmbeddedRequest(request);
@@ -26,5 +27,7 @@ export async function loader({ request }) {
     return redirect(`/mocklogin?my_token=${createAppJwt({ shop })}`);
   }
 
-  return renderEmbeddedApp(request, shop);
+  return null;
 }
+
+export default Index;

@@ -17,7 +17,11 @@ export function BlockStack({ children, gap = "base" }) {
 }
 
 export function InlineStack({ children, gap = "base" }) {
-  return <s-stack direction="inline" gap={spacing(gap)} alignItems="center">{children}</s-stack>;
+  return (
+    <s-stack direction="inline" gap={spacing(gap)} alignItems="center">
+      {children}
+    </s-stack>
+  );
 }
 
 export function Button({ children, onClick, variant = "secondary", disabled = false }) {
@@ -31,10 +35,13 @@ export function Button({ children, onClick, variant = "secondary", disabled = fa
 export function Link({ children, url, onClick, target }) {
   if (onClick) {
     return (
-      <s-link href="#" onClick={(event) => {
-        event.preventDefault();
-        onClick(event);
-      }}>
+      <s-link
+        href="#"
+        onClick={(event) => {
+          event.preventDefault();
+          onClick(event);
+        }}
+      >
         {children}
       </s-link>
     );
@@ -84,9 +91,11 @@ export function Icon() {
 }
 
 export function List({ children, type = "bullet" }) {
-  return type === "number"
-    ? <s-ordered-list>{children}</s-ordered-list>
-    : <s-unordered-list>{children}</s-unordered-list>;
+  return type === "number" ? (
+    <s-ordered-list>{children}</s-ordered-list>
+  ) : (
+    <s-unordered-list>{children}</s-unordered-list>
+  );
 }
 
 List.Item = function ListItem({ children }) {
@@ -97,11 +106,12 @@ export function Spinner() {
   return <s-spinner accessibilityLabel="Loading"></s-spinner>;
 }
 
-export function TextField({ label, value, onChange }) {
+export function TextField({ label, value, onChange, placeholder = "" }) {
   return (
     <s-text-field
-      label={label}
+      label={label || "Value"}
       value={value}
+      placeholder={placeholder}
       onInput={(event) => onChange?.(event.currentTarget.value)}
     ></s-text-field>
   );
@@ -121,13 +131,19 @@ export function Select({ label, options, value, onChange }) {
   return (
     <s-select label={label} value={value} onChange={(event) => onChange?.(event.currentTarget.value)}>
       {options.map((option) => (
-        <s-option key={option.value} value={option.value}>{option.label}</s-option>
+        <s-option key={option.value} value={option.value}>
+          {option.label}
+        </s-option>
       ))}
     </s-select>
   );
 }
 
-export const Layout = ({ children }) => <s-stack direction="block" gap="base">{children}</s-stack>;
+export const Layout = ({ children }) => (
+  <s-stack direction="block" gap="base">
+    {children}
+  </s-stack>
+);
 Layout.Section = ({ children }) => <s-box>{children}</s-box>;
 
 export const ButtonGroup = ({ children }) => <s-button-group gap="base">{children}</s-button-group>;

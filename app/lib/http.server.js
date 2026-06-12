@@ -1,9 +1,5 @@
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
 import { CONTENT_TYPE_JSON } from './env.server.js';
-import { contentSecurityPolicy, isEmbedded, verifyShopifyHmac } from './shopify-auth.server.js';
-
-const rootDir = process.cwd();
+import { verifyShopifyHmac } from './shopify-auth.server.js';
 
 export function json(data, init = {}) {
   return new Response(JSON.stringify(data), {
@@ -20,16 +16,6 @@ export function redirect(location, status = 302) {
     status,
     headers: {
       Location: location,
-    },
-  });
-}
-
-export async function renderEmbeddedApp(request, shop) {
-  const html = await readFile(resolve(rootDir, 'views/index.html'), 'utf8');
-  return new Response(html, {
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Content-Security-Policy': contentSecurityPolicy(shop, isEmbedded(new URL(request.url).searchParams)),
     },
   });
 }

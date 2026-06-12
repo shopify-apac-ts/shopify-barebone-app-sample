@@ -1,17 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useAppBridge } from '../shims/app-bridge-react';
-import { Redirect } from '../shims/app-bridge-actions';
-import { authenticatedFetch } from '../shims/app-bridge-utils';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 import { Page, Card, Layout, Link, Badge, Text, Spinner, List, BlockStack, Button, Label, Form, ButtonGroup } from '../components/PolarisWeb';
 
-import { _decodeSessionToken, _getAdminFromShop, _getShopFromQuery } from "../utils/my_util";
 
 // Bulk opearation sample for product impporting with a file uploader.
 // Read https://shopify.dev/docs/api/usage/bulk-operations/imports
 function BulkOperation() {
-    const app = useAppBridge();
 
-    const shop = _getShopFromQuery(window);
+    const shop = getShopFromLocation();
 
     const [data, setData] = useState({});
 
@@ -31,7 +28,7 @@ function BulkOperation() {
         setId(``);
         setUrl(``);
         setPUrl(``);
-        authenticatedFetch(app)(`/bulkoperation?check=${true}`).then((response) => {
+        authenticatedFetch(`/bulkoperation?check=${true}`).then((response) => {
             response.json().then((json) => {
                 console.log(JSON.stringify(json, null, 4));
                 setRes(JSON.stringify(json, null, 4));
@@ -49,7 +46,7 @@ function BulkOperation() {
     };
 
     useEffect(() => {
-        authenticatedFetch(app)(`/bulkoperation?`).then((response) => {
+        authenticatedFetch(`/bulkoperation?`).then((response) => {
             response.json().then((json) => {
                 console.log(JSON.stringify(json, null, 4));
                 setData(json);
@@ -82,7 +79,7 @@ function BulkOperation() {
                             <p>&nbsp;</p>
                             <Button variant="primary" onClick={() => {
                                 setAccessing(true);
-                                authenticatedFetch(app)(`/bulkoperation?key=${key}`).then((response) => {
+                                authenticatedFetch(`/bulkoperation?key=${key}`).then((response) => {
                                     response.json().then((json) => {
                                         console.log(JSON.stringify(json, null, 4));
                                         setAccessing(false);
@@ -106,7 +103,7 @@ function BulkOperation() {
                         <List.Item>
                             <p>
                                 After the operation started, you can check the latest status with <Link url={`https://shopify.dev/docs/api/admin-graphql/unstable/objects/queryroot#field-queryroot-currentbulkoperation`} target="_blank">
-                                    currentBulkOperation query</Link> and seeing <Link url={`https://${_getAdminFromShop(shop)}/products`} target="_blank">Products</Link>.
+                                    currentBulkOperation query</Link> and seeing <Link url={`https://${ getAdminFromShop(shop)}/products`} target="_blank">Products</Link>.
                             </p>
                             <p>&nbsp;</p>
                             <Button variant="primary" onClick={() => {
@@ -124,7 +121,7 @@ function BulkOperation() {
                             <p>&nbsp;</p>
                             <Button variant="primary" onClick={() => {
                                 setRes(``);
-                                authenticatedFetch(app)(`/bulkoperation?id=${id}`).then((response) => {
+                                authenticatedFetch(`/bulkoperation?id=${id}`).then((response) => {
                                     response.json().then((json) => {
                                         console.log(JSON.stringify(json, null, 4));
                                     }).catch((e) => {
