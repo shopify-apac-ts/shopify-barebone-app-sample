@@ -4,7 +4,7 @@ export function Page({ title, children }) {
 
 export function Card({ children }) {
   return (
-    <s-section padding="base">
+    <s-section padding="base" className="sample-card">
       <s-box padding="base" border="base" borderRadius="base" background="base">
         {children}
       </s-box>
@@ -13,11 +13,11 @@ export function Card({ children }) {
 }
 
 export function BlockStack({ children, gap = "base" }) {
-  return <s-stack direction="block" gap={gap}>{children}</s-stack>;
+  return <s-stack direction="block" gap={spacing(gap)}>{children}</s-stack>;
 }
 
 export function InlineStack({ children, gap = "base" }) {
-  return <s-stack direction="inline" gap={gap} alignItems="center">{children}</s-stack>;
+  return <s-stack direction="inline" gap={spacing(gap)} alignItems="center">{children}</s-stack>;
 }
 
 export function Button({ children, onClick, variant = "secondary", disabled = false }) {
@@ -39,7 +39,14 @@ export function Link({ children, url, onClick, target }) {
       </s-link>
     );
   }
-  return <s-link href={url} target={target}>{children}</s-link>;
+  if (target || isExternalUrl(url)) {
+    return (
+      <a className="sample-link" href={url} target={target || "_blank"} rel="noreferrer">
+        {children}
+      </a>
+    );
+  }
+  return <s-link href={url}>{children}</s-link>;
 }
 
 export function Badge({ children, tone = "info" }) {
@@ -126,3 +133,23 @@ Layout.Section = ({ children }) => <s-box>{children}</s-box>;
 export const ButtonGroup = ({ children }) => <s-button-group gap="base">{children}</s-button-group>;
 export const Label = ({ children }) => <s-text type="strong">{children}</s-text>;
 export const Form = ({ children, onSubmit }) => <form onSubmit={onSubmit}>{children}</form>;
+
+function spacing(value) {
+  const legacyPolarisSpacing = {
+    "0": "none",
+    "025": "small",
+    "050": "small",
+    "100": "small",
+    "200": "base",
+    "300": "base",
+    "400": "large",
+    "500": "large",
+    "600": "large",
+    "800": "large",
+  };
+  return legacyPolarisSpacing[value] || value;
+}
+
+function isExternalUrl(url = "") {
+  return /^https?:\/\//.test(url);
+}
