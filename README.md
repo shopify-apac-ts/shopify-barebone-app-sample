@@ -10,12 +10,12 @@ For quick start with automatically generated code, go to the [official CLI tutor
 # Code structure
 ```
 --------- Backend process in a server (Node.js) ---------
-app/ ... React Router route modules, UI pages, Polaris web component helpers, and server helpers for OAuth, session token validation, Storefront API, Customer Account API, GraphQL calls, and DB access. No Express wrapper and no Shopify CLI generated app template are used.
+app/ ... React Router route modules, UI pages written directly with Polaris and App Bridge web components, and server helpers for OAuth, session token validation, Storefront API, Customer Account API, GraphQL calls, and DB access. No Express wrapper and no Shopify CLI generated app template are used.
 
   ./root.jsx ... React Router HTML shell that loads App Bridge and Polaris web components from Shopify CDN.
+  ./AppShell.jsx ... Embedded app shell using App Bridge web components for the title bar and app navigation.
   ./routes/ ... HTTP entry points. Each route is intentionally thin and points to one Shopify sample concept.
-  ./pages/ ... Embedded app UI pages rendered by React Router.
-  ./components/ ... Small local UI helpers around Polaris web components and the App Bridge shell.
+  ./pages/ ... Embedded app UI pages rendered by React Router with Polaris web components used directly in each page.
   ./lib/ ... Server-side Shopify API helpers, grouped by learning topic.
   ./utils/ ... Browser-side App Bridge and URL helpers used by UI pages.
   ./assets/ ... Static source assets imported by route modules.
