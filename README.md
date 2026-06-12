@@ -41,6 +41,16 @@ For creating the embedded app UI, the following contents might help you.
 
 For extensions like Theme App Extensinons, Shopify Functions, and Checkout UI Extensions, refer to the [App extensions](https://shopify.dev/docs/apps/build/app-extensions) and [List of app extensions](https://shopify.dev/docs/apps/build/app-extensions/list-of-app-extensions).
 
+# Where to start reading
+If you are new to this sample, start from these files instead of reading the repository from top to bottom.
+
+- Embedded admin UI: start with `app/root.jsx`. This file loads App Bridge and Polaris web components from Shopify CDN, so pages can use tags like `<s-page>` and `<s-button>` directly. Then read `app/AppShell.jsx` for the App Bridge title bar and app navigation, and `app/pages/Index.jsx` for the first embedded UI screen.
+- OAuth and embedded app entry: read `app/routes/index.jsx` and `app/routes/auth.jsx` first. `index.jsx` reuses the auth loader, and `auth.jsx` verifies embedded requests, checks installation state, and starts OAuth when the shop has not installed the app yet. Continue to `app/routes/auth.callback.jsx` and `app/lib/oauth.server.js` to see the access token exchange and storage flow.
+- Server-side sample endpoints: read the thin route modules under `app/routes/` together with the matching topic helpers under `app/lib/`. For example, `app/routes/storefront.jsx` points to Storefront API and Customer Account API helpers, while `app/routes/sessiontoken.jsx` points to session token validation helpers.
+- Browser-side App Bridge helpers: read `app/utils/app-bridge.js` for ID token retrieval, authenticated fetches, embedded navigation, and external tab handling used by the admin UI pages.
+- Checkout, customer account, POS, web pixel, theme, and function customizations: read the matching directories under `extensions/`. These are deployed by Shopify CLI, even though the main app server is hand-written with React Router.
+- Plain custom storefront sample: read `views/storefront.html` after `app/routes/storefront.jsx` if you want to follow Cart API, tokenless Storefront API access, and Customer Account API login outside the embedded admin UI.
+
 # How to run
 0. Create your Shopify partner account from [here](https://www.shopify.com/partners) and create a Shopify app **manually** (not choosing Shopify CLI) in the app menu of [your dev. dashboard](https://dev.shopify.com/dashboard). Also, [create a development store](https://shopify.dev/docs/api/development-stores#create-a-development-store-to-test-your-app) to install this app too. If you want to customize this sample code, don't forget to clone (fork) this repository to make your own one.
 
