@@ -1,7 +1,6 @@
-import { useState, useCallback } from 'react';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
-import { Page, Card, Layout, Link, Button, Badge, BlockStack, List } from '../components/PolarisWeb';
+import { useState } from 'react';
+import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction } from "../utils/app-bridge";
+import { decodeSessionToken, foldLongLine, getCurrentHost } from "../utils/shop";
 
 
 // App Bridge Session Token sample
@@ -17,38 +16,38 @@ function SessionToken() {
   const [res, setRes] = useState('');
 
   return (
-    <Page title="Getting started with session token authentication">
-      <BlockStack gap="500">
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/apps/auth/oauth/session-tokens/getting-started#step-1-get-a-session-token" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <Button variant="primary" onClick={() => {
+    <s-page heading="Getting started with session token authentication">
+      <s-stack direction="block" gap="large">
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/apps/auth/oauth/session-tokens/getting-started#step-1-get-a-session-token" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-button variant="primary" onClick={() => {
                 getSessionToken().then((sessionToken) => {
                   setRaw(foldLongLine(`${sessionToken}`, 80));
                   setDecoded(JSON.stringify(decodeSessionToken(sessionToken), null, 4));
                 });
               }}>
                 Show the current session token data
-              </Button>
-            </Layout.Section>
-            <Layout.Section>
-              <Badge>Raw Data:</Badge>
+              </s-button>
+            </s-box>
+            <s-box>
+              <s-badge>Raw Data:</s-badge>
               <pre>{raw}</pre>
-              <Badge>Decoded Payload:</Badge>
+              <s-badge>Decoded Payload:</s-badge>
               <pre>{decoded}</pre>
-            </Layout.Section>
-          </Layout>
-        </Card>
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/apps/auth/oauth/session-tokens/getting-started#step-2-authenticate-your-requests" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <Button variant="primary" onClick={() => {
+            </s-box>
+          </s-stack>
+        </s-section>
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/apps/auth/oauth/session-tokens/getting-started#step-2-authenticate-your-requests" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-button variant="primary" onClick={() => {
                 setUrl('');
                 setAuth('');
                 setRes('');
@@ -69,46 +68,46 @@ function SessionToken() {
                 });
               }}>
                 Get your stored access token with the payload above in OAuth flow
-              </Button>
-            </Layout.Section>
-            <Layout.Section>
-              <Badge>Request URL:</Badge>
+              </s-button>
+            </s-box>
+            <s-box>
+              <s-badge>Request URL:</s-badge>
               <pre>{url}</pre>
-              <Badge>Request Authentication Bearer:</Badge>
+              <s-badge>Request Authentication Bearer:</s-badge>
               <pre>{auth}</pre>
-              <Badge>My OAuth Authorization Result:</Badge>
+              <s-badge>My OAuth Authorization Result:</s-badge>
               <pre>{res}</pre>
-            </Layout.Section>
-          </Layout>
-        </Card>
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <List type="bullet">
-                <List.Item>
-                  If you want to connect to your own service like <Link url={`https://${getCurrentHost()}/mocklogin`} target="_blank">this</Link> outside Shopify Admin,
-                  you can use the session token validation for passing <Badge tone="info">shop</Badge> in a secure way as the following button does.
-                </List.Item>
-                <List.Item>
-                  If you add <Badge>?external=true</Badge> to <Link url="https://shopify.dev/apps/deployment/web#step-5-update-urls-in-the-partner-dashboard" target="_blank">YOUR_APP_URL</Link> (<Badge>https://{getCurrentHost()}/?external=true</Badge>),
+            </s-box>
+          </s-stack>
+        </s-section>
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-unordered-list>
+                <s-list-item>
+                  If you want to connect to your own service like <s-link href={`https://${getCurrentHost()}/mocklogin`} target="_blank">this</s-link> outside Shopify Admin,
+                  you can use the session token validation for passing <s-badge tone="info">shop</s-badge> in a secure way as the following button does.
+                </s-list-item>
+                <s-list-item>
+                  If you add <s-badge>?external=true</s-badge> to <s-link href="https://shopify.dev/apps/deployment/web#step-5-update-urls-in-the-partner-dashboard" target="_blank">YOUR_APP_URL</s-link> (<s-badge>https://{getCurrentHost()}/?external=true</s-badge>),
                   all pages redirect to the following button target which shows how <b>service connector app install flow</b> works.
-                </List.Item>
-              </List>
-            </Layout.Section>
-            <Layout.Section>
-              <Button variant="primary" onClick={() => {
+                </s-list-item>
+              </s-unordered-list>
+            </s-box>
+            <s-box>
+              <s-button variant="primary" onClick={() => {
                 getSessionToken().then((sessionToken) => {
                   // Use the current session token for external site validation for connectihg shops.
                   // Read https://shopify.dev/apps/auth/oauth/session-tokens/getting-started#step-2-authenticate-your-requests
                   redirect.dispatch(RedirectAction.REMOTE, { url: `https://${getCurrentHost()}/mocklogin?sessiontoken=${sessionToken}`, newContext: true });
                 });
               }}>Connect to your service with the session token
-              </Button>
-            </Layout.Section>
-          </Layout>
-        </Card>
-      </BlockStack>
-    </Page>
+              </s-button>
+            </s-box>
+          </s-stack>
+        </s-section>
+      </s-stack>
+    </s-page>
   );
 }
 

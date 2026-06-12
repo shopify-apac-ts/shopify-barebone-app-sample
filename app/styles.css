@@ -2,19 +2,6 @@ body {
   margin: 0;
 }
 
-.sample-card + .sample-card {
-  margin-top: 16px;
-}
-
-.sample-link {
-  color: inherit;
-  text-decoration: underline;
-}
-
-.sample-link:hover {
-  text-decoration-thickness: 2px;
-}
-
 pre {
   background: #f6f6f7;
   border: 1px solid #d2d5d8;
@@ -30,10 +17,4 @@ select,
 textarea {
   box-sizing: border-box;
   max-width: 100%;
-}
-
-form button {
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 8px 12px;
 }

@@ -1,6 +1,5 @@
-import { Page, Card, Layout, Link, List, Badge, BlockStack } from '../components/PolarisWeb';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
+import { createRedirect, RedirectAction } from "../utils/app-bridge";
+import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
 // Checkout UI sample
@@ -14,66 +13,68 @@ function CheckoutUi() {
   const shop = getShopFromLocation();
 
   return (
-    <Page title="Checkout UI sample for upselling / store review / IP address blocking">
-      <BlockStack gap="500">
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/docs/api/checkout-ui-extensions" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <List type="number">
-                <List.Item>
+    <s-page heading="Checkout UI sample for upselling / store review / IP address blocking">
+      <s-stack direction="block" gap="large">
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-ordered-list>
+                <s-list-item>
                   <p>
-                    Go to <Link onClick={() => {
+                    Go to <s-link href="#" onClick={(event) => {
+                      event.preventDefault();
                       redirect.dispatch(RedirectAction.APP, '/postpurchase');
-                    }}>Post-purchase sample</Link> to <b>add all used metafields and set the values</b>.
+                    }}>Post-purchase sample</s-link> to <b>add all used metafields and set the values</b>.
                   </p>
-                </List.Item>
-                <List.Item>
+                </s-list-item>
+                <s-list-item>
                   <p>
-                    Add <b>three instances of this app</b> in the locations of <Badge tone='info'>'<b>purchase.checkout.block.render</b>' = Dynamic / '<b>purchase.checkout.contact.render-after</b>' = Static /
-                      '<b>purchase.checkout.actions.render-before</b>' = Static</Badge> in <Link url={`https://${ getAdminFromShop(shop)}/settings/checkout/editor`} target="_blank">checkout editor</Link>, seeing <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/extension-points-overview" target="_blank">this dev. page</Link> and set the IP address to <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#block-progress" target="_blank">block</Link> in their settings. You can check your IP address in external sites
-                    like <Link url="https://whatismyipaddress.com/" target="_blank">this</Link>.
+                    Add <b>three instances of this app</b> in the locations of <s-badge tone='info'>'<b>purchase.checkout.block.render</b>' = Dynamic / '<b>purchase.checkout.contact.render-after</b>' = Static /
+                      '<b>purchase.checkout.actions.render-before</b>' = Static</s-badge> in <s-link href={`https://${ getAdminFromShop(shop)}/settings/checkout/editor`} target="_blank">checkout editor</s-link>, seeing <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/extension-points-overview" target="_blank">this dev. page</s-link> and set the IP address to <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#block-progress" target="_blank">block</s-link> in their settings. You can check your IP address in external sites
+                    like <s-link href="https://whatismyipaddress.com/" target="_blank">this</s-link>.
                   </p>
-                </List.Item>
-              </List>
-            </Layout.Section>
-          </Layout>
-        </Card>
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/docs/apps/checkout/build-options" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <List type="number">
-                <List.Item>
+                </s-list-item>
+              </s-ordered-list>
+            </s-box>
+          </s-stack>
+        </s-section>
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/docs/apps/checkout/build-options" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-ordered-list>
+                <s-list-item>
                   <p>
-                    Visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to check how your checkout UI extensions work added above. You can see the demo of this extension <Link url={`https://github.com/benzookapi/shopify-barebone-app-sample/wiki#checkout-ui-extensions`} target="_blank">here</Link> too.
+                    Visit <s-link href={`https://${shop}`} target="_blank">your theme storefront</s-link> to check how your checkout UI extensions work added above. You can see the demo of this extension <s-link href={`https://github.com/benzookapi/shopify-barebone-app-sample/wiki#checkout-ui-extensions`} target="_blank">here</s-link> too.
                   </p>
-                </List.Item>
-                <List.Item>
+                </s-list-item>
+                <s-list-item>
                   <p>
-                    You can check the upsell products in <Link url={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">orders </Link> with detailed info.
+                    You can check the upsell products in <s-link href={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">orders </s-link> with detailed info.
                   </p>
                   <p>
-                    Also, you can check the review score of each buyer in <Badge>barebone_app_review.score</Badge> metafield of <Link url={`https://${ getAdminFromShop(shop)}/customers`} target="_blank">customers</Link>.
+                    Also, you can check the review score of each buyer in <s-badge>barebone_app_review.score</s-badge> metafield of <s-link href={`https://${ getAdminFromShop(shop)}/customers`} target="_blank">customers</s-link>.
                   </p>
-                </List.Item>
-              </List>
-            </Layout.Section>
-            <Layout.Section>
+                </s-list-item>
+              </s-ordered-list>
+            </s-box>
+            <s-box>
               <p>
-                <b>TIPS: </b>This extension uses its own provided <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#api-access" target="_blank">Storefront API calls</Link> and app <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#network-access" target="_blank">server side access</Link> shared with <Link onClick={() => {
+                <b>TIPS: </b>This extension uses its own provided <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#api-access" target="_blank">Storefront API calls</s-link> and app <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#network-access" target="_blank">server side access</s-link> shared with <s-link href="#" onClick={(event) => {
+                  event.preventDefault();
                   redirect.dispatch(RedirectAction.APP, '/postpurchase');
-                }}>Post-purchase sample</Link> wtih <Link url="https://shopify.dev/docs/api/checkout-ui-extensions/unstable/targets/block/purchase-thank-you-block-render#standardapi-propertydetail-sessiontoken" target="_blank">session tokens</Link>.
+                }}>Post-purchase sample</s-link> wtih <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/unstable/targets/block/purchase-thank-you-block-render#standardapi-propertydetail-sessiontoken" target="_blank">session tokens</s-link>.
               </p>
-            </Layout.Section>
-          </Layout>
-        </Card>
-      </BlockStack>
-    </Page>
+            </s-box>
+          </s-stack>
+        </s-section>
+      </s-stack>
+    </s-page>
   );
 }
 

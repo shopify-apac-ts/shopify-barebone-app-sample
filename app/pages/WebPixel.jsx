@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
-import { Page, Card, Layout, Link, List, Badge, Checkbox, TextField, Button, Spinner, BlockStack } from '../components/PolarisWeb';
+import { authenticatedFetch } from "../utils/app-bridge";
+import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
 // Web Pixel sample
@@ -22,50 +21,34 @@ function WebPixel() {
   const [accessing, setAccessing] = useState(false);
 
   return (
-    <Page title="Web Pixel basic usage for GA4 event passing">
-      <BlockStack gap="500">
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/apps/marketing/pixels/getting-started" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <List type="number">
-                <List.Item>
+    <s-page heading="Web Pixel basic usage for GA4 event passing">
+      <s-stack direction="block" gap="large">
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/apps/marketing/pixels/getting-started" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-ordered-list>
+                <s-list-item>
                   <p>
-                    Set up your <Link url="https://support.google.com/analytics/answer/9303323" target="_blank">Data Streams</Link> in <Link url="https://analytics.google.com" target="_blank">Google Analytics</Link>
-                    to send checkout events like <Badge tone="info">checkout_started</Badge> within Web Pixel <Link url="https://www.w3schools.com/html/html5_webworkers.asp" target="_blank">Web Workers</Link> which cannot be done by
-                    Theme App Extention or manual insertion of <Badge>header GA Tag</Badge>.
+                    Set up your <s-link href="https://support.google.com/analytics/answer/9303323" target="_blank">Data Streams</s-link> in <s-link href="https://analytics.google.com" target="_blank">Google Analytics</s-link>
+                    to send checkout events like <s-badge tone="info">checkout_started</s-badge> within Web Pixel <s-link href="https://www.w3schools.com/html/html5_webworkers.asp" target="_blank">Web Workers</s-link> which cannot be done by
+                    Theme App Extention or manual insertion of <s-badge>header GA Tag</s-badge>.
                     Other events outside checkouts like page views, adding to carts can be sent by the GA tag insertion automatically which can be tested by
-                    <Link url={`https://${ getAdminFromShop(shop)}/themes/current/editor?context=apps`} target="_blank">the app embed block named 'Barebone App Embed TP' of this app</Link>.
+                    <s-link href={`https://${ getAdminFromShop(shop)}/themes/current/editor?context=apps`} target="_blank">the app embed block named 'Barebone App Embed TP' of this app</s-link>.
                   </p>
-                  <BlockStack gap="500">
-                    <TextField
-                      label="Input your GA4 Measurement ID"
-                      value={ga4Id}
-                      onChange={ga4IdChange}
-                      autoComplete="off"
-                      placeholder="G-XXXXXXXXXX"
-                    />
-                    <TextField
-                      label="Input your GA4 API Secret"
-                      value={ga4Sec}
-                      onChange={ga4SecChange}
-                      autoComplete="off"
-                      placeholder="sXXXXXXXX-rX_XXXXXXX"
-                    />
-                  </BlockStack>
-                  <p>The values above come from <Link url="https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?hl=ja&client_type=gtag" target="_blank">
-                    Google Analytics Data Stream settings</Link>.
+                  <s-stack direction="block" gap="large">
+                    <s-text-field label="Input your GA4 Measurement ID" value={ga4Id} onInput={(event) => ga4IdChange(event.currentTarget.value)} placeholder="G-XXXXXXXXXX"></s-text-field>
+                    <s-text-field label="Input your GA4 API Secret" value={ga4Sec} onInput={(event) => ga4SecChange(event.currentTarget.value)} placeholder="sXXXXXXXX-rX_XXXXXXX"></s-text-field>
+                  </s-stack>
+                  <p>The values above come from <s-link href="https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?hl=ja&client_type=gtag" target="_blank">
+                    Google Analytics Data Stream settings</s-link>.
                   </p>
-                  <Checkbox
-                    label="Use debug (If you want to check the result of event sending in the browser console, check this on)"
-                    checked={ga4Debug}
-                    onChange={ga4DebugChange}
-                  />
-                </List.Item>
-                <List.Item>
-                  <Button variant="primary" onClick={() => {
+                  <s-checkbox label="Use debug (If you want to check the result of event sending in the browser console, check this on)" checked={ga4Debug} onChange={(event) => ga4DebugChange(event.currentTarget.checked)}></s-checkbox>
+                </s-list-item>
+                <s-list-item>
+                  <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/webPixelCreate"
                     authenticatedFetch(`/webpixel?ga4Id=${ga4Id}&ga4Sec=${ga4Sec}&ga4Debug=${ga4Debug}`).then((response) => {
@@ -85,33 +68,33 @@ function WebPixel() {
                     });
                   }}>
                     Create your Web Pixel
-                  </Button>&nbsp;
-                  <Badge tone='info'>Result: <APIResult res={result} loading={accessing} /></Badge>
-                </List.Item>
-                <List.Item>
-                  Go to <Link url={`https://${ getAdminFromShop(shop)}/settings/customer_events`} target="_blank">customer events</Link> to check if the app pixel is created and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> with
-                  <Badge>Developer Console</Badge> on to see which event triggered by Web Pixel. If you add <Link url={`https://${ getAdminFromShop(shop)}/themes/current/editor`} target="_blank">the app block named 'Barebone App Block TP' of this app</Link> to your theme app sections,
-                  you can see <Badge>your own custom event</Badge> triggered in the pages you add the section, too.
-                </List.Item>
-              </List>
-            </Layout.Section>
-          </Layout>
-        </Card>
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <p>You can check which events were sent in <Link url="https://analytics.google.com" target="_blank">Google Analytics</Link> dashboard.</p>
-            </Layout.Section>
-          </Layout>
-        </Card>
-      </BlockStack>
-    </Page>
+                  </s-button>&nbsp;
+                  <s-badge tone='info'>Result: <APIResult res={result} loading={accessing} /></s-badge>
+                </s-list-item>
+                <s-list-item>
+                  Go to <s-link href={`https://${ getAdminFromShop(shop)}/settings/customer_events`} target="_blank">customer events</s-link> to check if the app pixel is created and visit <s-link href={`https://${shop}`} target="_blank">your theme storefront</s-link> with
+                  <s-badge>Developer Console</s-badge> on to see which event triggered by Web Pixel. If you add <s-link href={`https://${ getAdminFromShop(shop)}/themes/current/editor`} target="_blank">the app block named 'Barebone App Block TP' of this app</s-link> to your theme app sections,
+                  you can see <s-badge>your own custom event</s-badge> triggered in the pages you add the section, too.
+                </s-list-item>
+              </s-ordered-list>
+            </s-box>
+          </s-stack>
+        </s-section>
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <p>You can check which events were sent in <s-link href="https://analytics.google.com" target="_blank">Google Analytics</s-link> dashboard.</p>
+            </s-box>
+          </s-stack>
+        </s-section>
+      </s-stack>
+    </s-page>
   );
 }
 
 function APIResult(props) {
   if (props.loading) {
-    return <Spinner accessibilityLabel="Calling Order GraphQL" size="small" />;
+    return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
   }
   return (<span>{props.res}</span>);
 }

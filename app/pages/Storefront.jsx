@@ -1,7 +1,6 @@
-import { useState, useCallback } from 'react';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
-import { Page, Card, Layout, Link, List, Button, Spinner, BlockStack, Badge } from '../components/PolarisWeb';
+import { useState } from 'react';
+import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
+import { getCurrentHost, getShopFromLocation } from "../utils/shop";
 
 
 // Storefront API sample
@@ -15,19 +14,19 @@ function Storefront() {
   const [accessing, setAccessing] = useState(false);
 
   return (
-    <Page title="Storefront API sample with Cart API, tokenless access, and Customer Account API">
-      <BlockStack gap="500">
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/docs/api/storefront/latest" target="_blank">Storefront API</Link><br />
-              <Link url="https://shopify.dev/docs/api/customer/latest" target="_blank">Customer Account API</Link><br />
-              <Link url="https://shopify.dev/docs/api/storefront/latest/mutations/cartCreate" target="_blank">cartCreate</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <List type="number">
-                <List.Item>
-                  <Button variant="primary" onClick={() => {
+    <s-page heading="Storefront API sample with Cart API, tokenless access, and Customer Account API">
+      <s-stack direction="block" gap="large">
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/docs/api/storefront/latest" target="_blank">Storefront API</s-link><br />
+              <s-link href="https://shopify.dev/docs/api/customer/latest" target="_blank">Customer Account API</s-link><br />
+              <s-link href="https://shopify.dev/docs/api/storefront/latest/mutations/cartCreate" target="_blank">cartCreate</s-link>
+            </s-box>
+            <s-box>
+              <s-ordered-list>
+                <s-list-item>
+                  <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     authenticatedFetch(`/storefront`).then((response) => {
                       response.json().then((json) => {
@@ -42,38 +41,39 @@ function Storefront() {
                     });
                   }}>
                     Prepare Storefront API access tokens
-                  </Button>
+                  </s-button>
                   <p><APIResult res={result} loading={accessing} /></p>
-                  <List type="bullet">
-                    <List.Item>
-                      <Badge tone="info">Tokenless Storefront API</Badge> can run the cart sample without a Storefront access token.
-                    </List.Item>
-                    <List.Item>
-                      <Badge tone="info">Public Storefront token</Badge> is still generated so the sample can compare tokenless and token-based browser calls.
-                    </List.Item>
-                    <List.Item>
-                      <Badge tone="info">Private delegated token</Badge> is kept server-side only for the server-call comparison.
-                    </List.Item>
-                  </List>
-                </List.Item>
-                <List.Item>
-                  Open the <Link onClick={() => {
+                  <s-unordered-list>
+                    <s-list-item>
+                      <s-badge tone="info">Tokenless Storefront API</s-badge> can run the cart sample without a Storefront access token.
+                    </s-list-item>
+                    <s-list-item>
+                      <s-badge tone="info">Public Storefront token</s-badge> is still generated so the sample can compare tokenless and token-based browser calls.
+                    </s-list-item>
+                    <s-list-item>
+                      <s-badge tone="info">Private delegated token</s-badge> is kept server-side only for the server-call comparison.
+                    </s-list-item>
+                  </s-unordered-list>
+                </s-list-item>
+                <s-list-item>
+                  Open the <s-link href="#" onClick={(event) => {
+                    event.preventDefault();
                     redirect.dispatch(RedirectAction.REMOTE, { url: `https://${getCurrentHost()}/storefront?shop=${shop}&public_token=${result.public_token.accessToken}`, newContext: true });
                   }}>plain custom storefront page
-                  </Link> using Cart API, tokenless access, and Customer Account API login.
-                </List.Item>
-              </List>
-            </Layout.Section>
-          </Layout>
-        </Card>
-      </BlockStack>
-    </Page>
+                  </s-link> using Cart API, tokenless access, and Customer Account API login.
+                </s-list-item>
+              </s-ordered-list>
+            </s-box>
+          </s-stack>
+        </s-section>
+      </s-stack>
+    </s-page>
   );
 }
 
 function APIResult(props) {
   if (props.loading) {
-    return <Spinner accessibilityLabel="Calling Order GraphQL" size="large" />;
+    return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
   }
   return (<pre>{JSON.stringify(props.res, null, 4)}</pre>);
 }

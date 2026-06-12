@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
 import { getAdminFromShop, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
-import { Page, Card, Layout, Link, Badge, Text, Spinner, List, BlockStack } from '../components/PolarisWeb';
 
 
 // Admin link sample with App Bridge redirection
@@ -34,62 +33,65 @@ function AdminLink() {
         }, [id]);
 
         return (
-            <Page title="You seem to have come through Admin Link!">
-                <Layout>
-                    <Layout.Section>
-                        <Text as='h2'>Your selected data id: <Badge tone='info'>{id}</Badge></Text>
-                        <Text>
-                            <Link onClick={() => { redirect.dispatch(RedirectAction.APP, '/adminlink'); }}>
+            <s-page heading="You seem to have come through Admin Link!">
+                <s-stack direction="block" gap="base">
+                    <s-box>
+                        <s-heading>Your selected data id: <s-badge tone='info'>{id}</s-badge></s-heading>
+                        <s-text>
+                            <s-link href="#" onClick={(event) => {
+                                event.preventDefault();
+                                redirect.dispatch(RedirectAction.APP, '/adminlink');
+                            }}>
                                 Go back
-                            </Link>
-                        </Text>
-                    </Layout.Section>
-                    <Layout.Section>
-                        <Badge tone="attention">If you come from a <b>product detail page</b>, you must see the following GraphQL response for the given id</Badge>
-                    </Layout.Section>
-                    <Layout.Section>
-                        <Card>
+                            </s-link>
+                        </s-text>
+                    </s-box>
+                    <s-box>
+                        <s-badge tone="warning">If you come from a <b>product detail page</b>, you must see the following GraphQL response for the given id</s-badge>
+                    </s-box>
+                    <s-box>
+                        <s-section>
                             <APIResult res={res} />
-                        </Card>
-                    </Layout.Section>
-                </Layout>
-            </Page>
+                        </s-section>
+                    </s-box>
+                </s-stack>
+            </s-page>
         );
     }
 
     return (
-        <Page title="Switch the request hanlding for embedded or unembedded.">
-            <BlockStack gap="500">
-                <Card sectioned={true}>
-                    <List type="bullet">
-                        <List.Item>
-                            This app endpoints (menus) accept embedded requests only with the parameter <Badge tone="info">embedded</Badge> = 1 to be protected by <Link url="https://shopify.dev/apps/auth/oauth/getting-started#step-2-verify-the-installation-request" target="_blank">hmac signature verification</Link>,
-                            but this page accepts unembedded ones supposed to be <b>accessed outside Shopify to be protected by Shopify login</b> of <Link url="https://shopify.dev/apps/tools/app-bridge/getting-started/app-setup#initialize-shopify-app-bridge-in-your-app" target="_blank">App Bridge force redirection</Link> (<Badge tone="info">forceRedirect: true</Badge>).
-                        </List.Item>
-                        <List.Item>
-                            Copy <Badge>{`${rawUrl}?shop=${shop}`}</Badge> to another browser in which you are not logged in to check if the page gets redirected to Shopify login (Disclaimer: the initial page should be blank for production).
-                        </List.Item>
-                    </List>
-                </Card>
-                <Card sectioned={true}>
-                    <List type="bullet">
-                        <List.Item>
-                            Check if <Badge>app://adminlink</Badge> is added in the admin extension link setting in <Badge>extensions/my-admin-link-product-details/shopify.extension.toml</Badge> file 
-                            for <Link url={`https://${ getAdminFromShop(shop)}/products`} target="_blank">product details</Link>.
-                        </List.Item>
-                        <List.Item>
-                            Once you click your extension label in <Badge tone="info">More actions</Badge> in your selected product details, this page shows up again in a diffrent UI checking if the <Badge tone="info">id</Badge> parameter is given or not.
-                        </List.Item>
-                    </List>
-                </Card>
-            </BlockStack>
-        </Page>
+        <s-page heading="Switch the request hanlding for embedded or unembedded.">
+            <s-stack direction="block" gap="large">
+                <s-section>
+                    <s-unordered-list>
+                        <s-list-item>
+                            This app endpoints (menus) accept embedded requests only with the parameter <s-badge tone="info">embedded</s-badge> = 1 to be protected by <s-link href="https://shopify.dev/apps/auth/oauth/getting-started#step-2-verify-the-installation-request" target="_blank">hmac signature verification</s-link>,
+                            but this page accepts unembedded ones supposed to be <b>accessed outside Shopify to be protected by Shopify login</b> of <s-link href="https://shopify.dev/apps/tools/app-bridge/getting-started/app-setup#initialize-shopify-app-bridge-in-your-app" target="_blank">App Bridge force redirection</s-link> (<s-badge tone="info">forceRedirect: true</s-badge>).
+                        </s-list-item>
+                        <s-list-item>
+                            Copy <s-badge>{`${rawUrl}?shop=${shop}`}</s-badge> to another browser in which you are not logged in to check if the page gets redirected to Shopify login (Disclaimer: the initial page should be blank for production).
+                        </s-list-item>
+                    </s-unordered-list>
+                </s-section>
+                <s-section>
+                    <s-unordered-list>
+                        <s-list-item>
+                            Check if <s-badge>app://adminlink</s-badge> is added in the admin extension link setting in <s-badge>extensions/my-admin-link-product-details/shopify.extension.toml</s-badge> file
+                            for <s-link href={`https://${ getAdminFromShop(shop)}/products`} target="_blank">product details</s-link>.
+                        </s-list-item>
+                        <s-list-item>
+                            Once you click your extension label in <s-badge tone="info">More actions</s-badge> in your selected product details, this page shows up again in a diffrent UI checking if the <s-badge tone="info">id</s-badge> parameter is given or not.
+                        </s-list-item>
+                    </s-unordered-list>
+                </s-section>
+            </s-stack>
+        </s-page>
     );
 }
 
 function APIResult(props) {
     if (Object.keys(props.res).length === 0) {
-        return <Spinner accessibilityLabel="Calling Order GraphQL" size="large" />;
+        return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
     }
     return (<pre>{props.res}</pre>);
 }

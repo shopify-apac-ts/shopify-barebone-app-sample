@@ -1,15 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
-import { Page, Card, Layout, Link, Badge, Text, Spinner, List, BlockStack, Button, Select, TextField } from '../components/PolarisWeb';
+import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
+import { getAdminFromShop, getQueryParam, getShopFromLocation } from "../utils/shop";
 
 
 // Order management sample for fulfillment, inventory, and fulfillment services with inventory management.
 // Read https://shopify.dev/docs/apps/fulfillment
 function OrderManage() {
     const redirect = createRedirect();
-
-    const rawUrl = getCurrentUrlWithoutQuery();
 
     const shop = getShopFromLocation();
 
@@ -50,27 +47,30 @@ function OrderManage() {
         }, ['']);
 
         return (
-            <Page title="Your oder details">
-                <Layout>
-                    <Layout.Section>
-                        <Link url="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/fulfillmentCreateV2" target="_blank">Dev. doc (1)</Link>&nbsp;&nbsp;
-                        <Link url="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/orderCapture" target="_blank">Dev. doc (2)</Link>
-                    </Layout.Section>
-                    <Layout.Section>
-                        <Text as='h2'>Your selected data id: <Badge tone='info'><Link url={`https://${ getAdminFromShop(shop)}/orders/${id}`} target="_blank">{id}</Link></Badge></Text>
-                        <Text>
-                            <Link onClick={() => { redirect.dispatch(RedirectAction.APP, '/ordermanage'); }}>
+            <s-page heading="Your oder details">
+                <s-stack direction="block" gap="base">
+                    <s-box>
+                        <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/fulfillmentCreateV2" target="_blank">Dev. doc (1)</s-link>&nbsp;&nbsp;
+                        <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/orderCapture" target="_blank">Dev. doc (2)</s-link>
+                    </s-box>
+                    <s-box>
+                        <s-heading>Your selected data id: <s-badge tone='info'><s-link href={`https://${ getAdminFromShop(shop)}/orders/${id}`} target="_blank">{id}</s-link></s-badge></s-heading>
+                        <s-text>
+                            <s-link href="#" onClick={(event) => {
+                                event.preventDefault();
+                                redirect.dispatch(RedirectAction.APP, '/ordermanage');
+                            }}>
                                 Go back
-                            </Link>
-                        </Text>
-                    </Layout.Section>
-                    <Layout.Section>
-                        <Card>
+                            </s-link>
+                        </s-text>
+                    </s-box>
+                    <s-box>
+                        <s-section>
                             <APIResult res={res} />
-                        </Card>
-                    </Layout.Section>
-                    <Layout.Section>
-                        <Button variant="primary" onClick={() => {
+                        </s-section>
+                    </s-box>
+                    <s-box>
+                        <s-button variant="primary" onClick={() => {
                             setRes(``);
                             authenticatedFetch(`/ordermanage?id=${id}&foids=${foIds}`).then((response) => {
                                 response.json().then((json) => {
@@ -82,10 +82,10 @@ function OrderManage() {
                                     setRes(``);
                                 });
                             });
-                        }}>Fulfillment this order</Button> with <Badge tone='info'>fulfillment order ids</Badge> and <Badge tone='info'>order.fulfillable = true</Badge>
-                    </Layout.Section>
-                    <Layout.Section>
-                        <Button variant="primary" onClick={() => {
+                        }}>Fulfillment this order</s-button> with <s-badge tone='info'>fulfillment order ids</s-badge> and <s-badge tone='info'>order.fulfillable = true</s-badge>
+                    </s-box>
+                    <s-box>
+                        <s-button variant="primary" onClick={() => {
                             setRes(``);
                             authenticatedFetch(`/ordermanage?id=${id}&trans=${trans}`).then((response) => {
                                 response.json().then((json) => {
@@ -97,42 +97,42 @@ function OrderManage() {
                                     setRes(``);
                                 });
                             });
-                        }}>Capture this order</Button> with <Badge tone='info'>transaction ids</Badge> and <Badge tone='info'>order.capturable = true</Badge>
-                    </Layout.Section>
-                </Layout>
-            </Page>
+                        }}>Capture this order</s-button> with <s-badge tone='info'>transaction ids</s-badge> and <s-badge tone='info'>order.capturable = true</s-badge>
+                    </s-box>
+                </s-stack>
+            </s-page>
         );
     }
 
     return (
-        <Page title="Order namagement sample for fulfillments, transactions, and filfillment services with inventory management">
-            <BlockStack gap="500">
-                <Card sectioned={true}>
-                    <Link url="https://shopify.dev/docs/apps/fulfillment" target="_blank">Dev. doc</Link>
+        <s-page heading="Order namagement sample for fulfillments, transactions, and filfillment services with inventory management">
+            <s-stack direction="block" gap="large">
+                <s-section>
+                    <s-link href="https://shopify.dev/docs/apps/fulfillment" target="_blank">Dev. doc</s-link>
                     <br /><br />
-                    <List type="number">
-                        <List.Item>
-                            Check if <Badge>app://ordermanage</Badge> is added in the admin link extension setting in <Badge>extensions/my-admin-link-order-details/shopify.extension.toml</Badge> file 
-                            for <Link url={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">order details</Link>.
-                        </List.Item>
-                        <List.Item>
-                            Once you click your extension label in <Badge tone="info">More actions</Badge> in your selected order details, this page shows up again in a diffrent UI for <Badge>fulfillment / capture</Badge>, checking if the <Badge tone="info">id</Badge> parameter is given or not.
-                        </List.Item>
-                        <List.Item>
-                            Check the <Link url="https://shopify.dev/docs/api/admin-graphql/unstable/objects/Order" target="_blank">admin order API specification</Link> to understand what data can be retrieved with it.
-                        </List.Item>
-                    </List>
-                </Card>
-                <Card sectioned={true}>
-                    <Link url="https://shopify.dev/docs/apps/fulfillment/fulfillment-service-apps" target="_blank">Dev. doc (1)</Link>
+                    <s-ordered-list>
+                        <s-list-item>
+                            Check if <s-badge>app://ordermanage</s-badge> is added in the admin link extension setting in <s-badge>extensions/my-admin-link-order-details/shopify.extension.toml</s-badge> file
+                            for <s-link href={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">order details</s-link>.
+                        </s-list-item>
+                        <s-list-item>
+                            Once you click your extension label in <s-badge tone="info">More actions</s-badge> in your selected order details, this page shows up again in a diffrent UI for <s-badge>fulfillment / capture</s-badge>, checking if the <s-badge tone="info">id</s-badge> parameter is given or not.
+                        </s-list-item>
+                        <s-list-item>
+                            Check the <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/objects/Order" target="_blank">admin order API specification</s-link> to understand what data can be retrieved with it.
+                        </s-list-item>
+                    </s-ordered-list>
+                </s-section>
+                <s-section>
+                    <s-link href="https://shopify.dev/docs/apps/fulfillment/fulfillment-service-apps" target="_blank">Dev. doc (1)</s-link>
                     <br />
-                    <Link url="https://shopify.dev/docs/apps/fulfillment/inventory-management-apps" target="_blank">Dev. doc (2)</Link>
+                    <s-link href="https://shopify.dev/docs/apps/fulfillment/inventory-management-apps" target="_blank">Dev. doc (2)</s-link>
                     <br />
-                    <Link url="https://shopify.dev/docs/apps/fulfillment/fulfillment-service-apps/manage-fulfillments" target="_blank">Dev. doc (3)</Link>
+                    <s-link href="https://shopify.dev/docs/apps/fulfillment/fulfillment-service-apps/manage-fulfillments" target="_blank">Dev. doc (3)</s-link>
                     <br /><br />
-                    <List type="number">
-                        <List.Item>
-                            <Button variant="primary" onClick={() => {
+                    <s-ordered-list>
+                        <s-list-item>
+                            <s-button variant="primary" onClick={() => {
                                 setAccessing(true);
                                 authenticatedFetch(`/ordermanage?fs=${true}`).then((response) => {
                                     response.json().then((json) => {
@@ -149,68 +149,62 @@ function OrderManage() {
                                         setResult('Error!');
                                     });
                                 });
-                            }}>Create a fulfillment service for this app</Button>&nbsp;
-                            <Badge tone='info'>Result: <APIResult2 res={result} loading={accessing} /></Badge>
-                        </List.Item>
-                        <List.Item>
-                            Make sure <Badge>Barebone app fulfillment service</Badge> is registed to <Badge tone='info'>App locations</Badge> in <Link url={`https://${ getAdminFromShop(shop)}/settings/locations`} target="_blank">location settings</Link>.
-                            Go to <Link url={`https://${ getAdminFromShop(shop)}/products`} target="_blank">product details</Link> to check <Badge>Barebone app fulfillment service</Badge> in <Badge tone='info'>[Inventory] &gt; [Edit locations]</Badge> in your selected product page
+                            }}>Create a fulfillment service for this app</s-button>&nbsp;
+                            <s-badge tone='info'>Result: <APIResult2 res={result} loading={accessing} /></s-badge>
+                        </s-list-item>
+                        <s-list-item>
+                            Make sure <s-badge>Barebone app fulfillment service</s-badge> is registed to <s-badge tone='info'>App locations</s-badge> in <s-link href={`https://${ getAdminFromShop(shop)}/settings/locations`} target="_blank">location settings</s-link>.
+                            Go to <s-link href={`https://${ getAdminFromShop(shop)}/products`} target="_blank">product details</s-link> to check <s-badge>Barebone app fulfillment service</s-badge> in <s-badge tone='info'>[Inventory] &gt; [Edit locations]</s-badge> in your selected product page
                             (If you have inventories in <b>other locations</b> for the product, <b>set zero</b> to use this app location for online checkout).
-                        </List.Item>
-                        <List.Item>
+                        </s-list-item>
+                        <s-list-item>
                             <p>Add inventories with the amount (+/-), state, and reason to this app's location.</p>
                             <p style={{ width: "300px" }}>
-                                <TextField
+                                <s-text-field
                                     label="Amount:"
-                                    type="number"
                                     value={delta}
-                                    onChange={deltaChange}
-                                    autoComplete="off"
-                                />
-                                <Select
+                                    onInput={(event) => deltaChange(event.currentTarget.value)}
+                                ></s-text-field>
+                                <s-select
                                     label="State:"
-                                    options={[
-                                        { label: 'Incoming', value: 'incoming' },
-                                        { label: 'Available', value: 'available' },
-                                        { label: 'Reserved', value: 'reserved' },
-                                        { label: 'Damaged', value: 'damaged' },
-                                        { label: 'Safety stock', value: 'safety_stock' },
-                                        { label: 'Quality control', value: 'quality_control' }
-                                    ]}
-                                    onChange={nameChange}
                                     value={name}
-                                />
-                                <Select
+                                    onChange={(event) => nameChange(event.currentTarget.value)}
+                                >
+                                    <s-option value="incoming">Incoming</s-option>
+                                    <s-option value="available">Available</s-option>
+                                    <s-option value="reserved">Reserved</s-option>
+                                    <s-option value="damaged">Damaged</s-option>
+                                    <s-option value="safety_stock">Safety stock</s-option>
+                                    <s-option value="quality_control">Quality control</s-option>
+                                </s-select>
+                                <s-select
                                     label="Reason:"
-                                    options={[
-                                        { label: 'Correction', value: 'correction' },
-                                        { label: 'Cycle count available', value: 'cycle_count_available' },
-                                        { label: 'Damaged', value: 'damaged' },
-                                        { label: 'Other', value: 'other' },
-                                        { label: 'Promotion', value: 'promotion' },
-                                        { label: 'Quality control', value: 'quality_control' },
-                                        { label: 'Received', value: 'received' },
-                                        { label: 'Reservation created', value: 'reservation_created' },
-                                        { label: 'Reservation deleted', value: 'reservation_deleted' },
-                                        { label: 'Reservation updated', value: 'reservation_updated' },
-                                        { label: 'Restock', value: 'restock' },
-                                        { label: 'Safety stock', value: 'safety_stock' },
-                                        { label: 'Shrinkage', value: 'shrinkage' }
-                                    ]}
-                                    onChange={reasonChange}
                                     value={reason}
-                                />
-                                <TextField
+                                    onChange={(event) => reasonChange(event.currentTarget.value)}
+                                >
+                                    <s-option value="correction">Correction</s-option>
+                                    <s-option value="cycle_count_available">Cycle count available</s-option>
+                                    <s-option value="damaged">Damaged</s-option>
+                                    <s-option value="other">Other</s-option>
+                                    <s-option value="promotion">Promotion</s-option>
+                                    <s-option value="quality_control">Quality control</s-option>
+                                    <s-option value="received">Received</s-option>
+                                    <s-option value="reservation_created">Reservation created</s-option>
+                                    <s-option value="reservation_deleted">Reservation deleted</s-option>
+                                    <s-option value="reservation_updated">Reservation updated</s-option>
+                                    <s-option value="restock">Restock</s-option>
+                                    <s-option value="safety_stock">Safety stock</s-option>
+                                    <s-option value="shrinkage">Shrinkage</s-option>
+                                </s-select>
+                                <s-text-field
                                     label="Ledger document URI:"
-                                    type="text"
                                     value={uri}
-                                    onChange={uriChange}
+                                    onInput={(event) => uriChange(event.currentTarget.value)}
                                     placeholder='https://www.shopify.com/'
-                                    autoComplete="off"
-                                />
+                                ></s-text-field>
                             </p>
                             <br />
-                            <Button variant="primary" onClick={() => {
+                            <s-button variant="primary" onClick={() => {
                                 setAccessing2(true);
                                 authenticatedFetch(`/ordermanage?delta=${delta}&name=${name}&reason=${reason}&uri=${uri}`).then((response) => {
                                     response.json().then((json) => {
@@ -230,52 +224,52 @@ function OrderManage() {
                                         setLink('');
                                     });
                                 });
-                            }}>Add inventories to this fulfillment service location</Button>&nbsp;
-                            <Badge tone='info'>Result: <APIResult2 res={result2} loading={accessing2} /></Badge>
+                            }}>Add inventories to this fulfillment service location</s-button>&nbsp;
+                            <s-badge tone='info'>Result: <APIResult2 res={result2} loading={accessing2} /></s-badge>
                             <br /><br />
                             <InventoryLink link={link}></InventoryLink>
-                        </List.Item>
-                        <List.Item>
-                            After you make a order of the procuct above through <Link url={`https://${shop}`} target="_blank">the storefront</Link> and go to <Link url={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">the order page</Link>, you see the new button labeled <Badge tone='info'>Request fulfillments</Badge>. Once you click the button, you see <Badge>{`{"kind":"FULFILLMENT_REQUEST"}`}</Badge>
-                            in your server log as accessing <Badge>/fulfillment_order_notification</Badge>.
-                        </List.Item>
-                        <List.Item>
-                            The callback (<Badge>/fulfillment_order_notification</Badge>) makes fulfillments one by one and after a while, you can see the requested fulfillments get shipped automatically.
-                            The callback (<Badge>/fetch_stock.json</Badge>) returns the initial inventories per SKU when a product is set to use this app inventory management.
-                            The callback (<Badge>/fetch_tracking_numbers.json</Badge>) returns the tracking numbers dynamically (this demo has fixed values and is not in this case).
-                        </List.Item>
-                    </List>
-                </Card>
-                <Card sectioned={true}>
-                    <List type="bullet">
-                        <List.Item>
+                        </s-list-item>
+                        <s-list-item>
+                            After you make a order of the procuct above through <s-link href={`https://${shop}`} target="_blank">the storefront</s-link> and go to <s-link href={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">the order page</s-link>, you see the new button labeled <s-badge tone='info'>Request fulfillments</s-badge>. Once you click the button, you see <s-badge>{`{"kind":"FULFILLMENT_REQUEST"}`}</s-badge>
+                            in your server log as accessing <s-badge>/fulfillment_order_notification</s-badge>.
+                        </s-list-item>
+                        <s-list-item>
+                            The callback (<s-badge>/fulfillment_order_notification</s-badge>) makes fulfillments one by one and after a while, you can see the requested fulfillments get shipped automatically.
+                            The callback (<s-badge>/fetch_stock.json</s-badge>) returns the initial inventories per SKU when a product is set to use this app inventory management.
+                            The callback (<s-badge>/fetch_tracking_numbers.json</s-badge>) returns the tracking numbers dynamically (this demo has fixed values and is not in this case).
+                        </s-list-item>
+                    </s-ordered-list>
+                </s-section>
+                <s-section>
+                    <s-unordered-list>
+                        <s-list-item>
                             <p>The inventory status changes as follows.</p>
-                            <p><b>Before checkout:</b> <Badge>Available</Badge> -&gt; <b>After checkout:</b> <Badge>Committed</Badge> -&gt; <b>After fulfillment:</b> <Badge>No status = the quantity is decreased</Badge></p>
-                            You can catch the change in <Link url='https://shopify.dev/docs/api/admin-graphql/unstable/enums/WebhookSubscriptionTopic#enums-INVENTORY_LEVELS_UPDATE' target='_blank'>inventory_levels/update webhook</Link> to query <Link url='https://shopify.dev/docs/apps/fulfillment/inventory-management-apps/quantities-states' target='_blank'>Inventory Item & Inventory Level</Link> to send back the latest quantities and status to your external system.
-                        </List.Item>
-                    </List>
-                    <List type="bullet">
-                        <List.Item>
-                            If you want to make this app a <Badge>shipping rate provider</Badge>, you have to call <Link url="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/carrierServiceCreate" target="_blank">carrierServiceCreate</Link> API for app defined rate registration. Instead, you can add your app defined shipping rate natively
-                            with <Link url="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/deliveryProfileCreate" target="_blank">deliveryProfileCreate</Link> API.
-                        </List.Item>
-                    </List>
-                </Card>
-            </BlockStack>
-        </Page>
+                            <p><b>Before checkout:</b> <s-badge>Available</s-badge> -&gt; <b>After checkout:</b> <s-badge>Committed</s-badge> -&gt; <b>After fulfillment:</b> <s-badge>No status = the quantity is decreased</s-badge></p>
+                            You can catch the change in <s-link href='https://shopify.dev/docs/api/admin-graphql/unstable/enums/WebhookSubscriptionTopic#enums-INVENTORY_LEVELS_UPDATE' target='_blank'>inventory_levels/update webhook</s-link> to query <s-link href='https://shopify.dev/docs/apps/fulfillment/inventory-management-apps/quantities-states' target='_blank'>Inventory Item & Inventory Level</s-link> to send back the latest quantities and status to your external system.
+                        </s-list-item>
+                    </s-unordered-list>
+                    <s-unordered-list>
+                        <s-list-item>
+                            If you want to make this app a <s-badge>shipping rate provider</s-badge>, you have to call <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/carrierServiceCreate" target="_blank">carrierServiceCreate</s-link> API for app defined rate registration. Instead, you can add your app defined shipping rate natively
+                            with <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/mutations/deliveryProfileCreate" target="_blank">deliveryProfileCreate</s-link> API.
+                        </s-list-item>
+                    </s-unordered-list>
+                </s-section>
+            </s-stack>
+        </s-page>
     );
 }
 
 function APIResult(props) {
     if (Object.keys(props.res).length === 0) {
-        return <Spinner accessibilityLabel="Calling Order GraphQL" size="large" />;
+        return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
     }
     return (<pre>{props.res}</pre>);
 }
 
 function APIResult2(props) {
     if (props.loading) {
-        return <Spinner accessibilityLabel="Calling Order GraphQL" size="small" />;
+        return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
     }
     return (<span>{props.res}</span>);
 }
@@ -284,7 +278,7 @@ function InventoryLink(props) {
     if (props.link === '') {
         return (<></>);
     }
-    return (<><p><b>Check the <Link url={props.link} target="_blank">inventory of this app location</Link>.</b></p></>);
+    return (<><p><b>Check the <s-link href={props.link} target="_blank">inventory of this app location</s-link>.</b></p></>);
 }
 
 export default OrderManage

@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
-import { Page, Card, Layout, Link, List, Badge, TextField, Button, Spinner, BlockStack } from '../components/PolarisWeb';
+import { authenticatedFetch } from "../utils/app-bridge";
+import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
 // Shopify Functions for shipping method sample
@@ -25,56 +24,38 @@ function FunctionShipping() {
   const [accessing, setAccessing] = useState(false);
 
   return (
-    <Page title="Create your original shipping rate filtering with Shopify Functions">
-      <BlockStack gap="500">
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/api/functions/reference/delivery-customization" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <List type="number">
-                <List.Item>Input a <Badge>shipping rate name</Badge> which you want to show only, from <Link url={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</Link>.
-                  <TextField
-                    label=""
-                    value={rate}
-                    onChange={rateChange}
-                    autoComplete="off"
-                    placeholder="Example: Standard"
-                  />
-                </List.Item>
-                <List.Item>Input a <Badge>zip code</Badge> which buyers input in their shipping address when the shipping rate shows up above.
-                  <TextField
-                    label=""
-                    value={zip}
-                    onChange={zipChange}
-                    autoComplete="off"
-                    placeholder="Example: 100-0001"
-                  />
-                </List.Item>
-              </List>
-            </Layout.Section>
-          </Layout>
-        </Card>
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/api/admin-graphql/2023-04/mutations/deliveryCustomizationCreate" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <List type="number">
-                <List.Item>
-                  Input your <Badge>Shopify Functions ID (uid)</Badge> in <Badge>extensions/my-function-shipping-ext/shopify.extension.toml</Badge> or <Link url="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</Link>
-                  <TextField
-                    label=""
-                    value={id}
-                    onChange={idChange}
-                    autoComplete="off"
-                    placeholder="Example: 4269092f-36ee-46e5-85bf-86bea1c8ff51"
-                  />
-                </List.Item>
-                <List.Item>
-                  <Button variant="primary" onClick={() => {
+    <s-page heading="Create your original shipping rate filtering with Shopify Functions">
+      <s-stack direction="block" gap="large">
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/api/functions/reference/delivery-customization" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-ordered-list>
+                <s-list-item>Input a <s-badge>shipping rate name</s-badge> which you want to show only, from <s-link href={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</s-link>.
+                  <s-text-field label="" value={rate} onInput={(event) => rateChange(event.currentTarget.value)} placeholder="Example: Standard"></s-text-field>
+                </s-list-item>
+                <s-list-item>Input a <s-badge>zip code</s-badge> which buyers input in their shipping address when the shipping rate shows up above.
+                  <s-text-field label="" value={zip} onInput={(event) => zipChange(event.currentTarget.value)} placeholder="Example: 100-0001"></s-text-field>
+                </s-list-item>
+              </s-ordered-list>
+            </s-box>
+          </s-stack>
+        </s-section>
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/api/admin-graphql/2023-04/mutations/deliveryCustomizationCreate" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-ordered-list>
+                <s-list-item>
+                  Input your <s-badge>Shopify Functions ID (uid)</s-badge> in <s-badge>extensions/my-function-shipping-ext/shopify.extension.toml</s-badge> or <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</s-link>
+                  <s-text-field label="" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: 4269092f-36ee-46e5-85bf-86bea1c8ff51"></s-text-field>
+                </s-list-item>
+                <s-list-item>
+                  <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/deliveryCustomizationCreate"
                     authenticatedFetch(`/functionshipping?rate=${rate}&zip=${zip}&id=${id}`).then((response) => {
@@ -94,24 +75,24 @@ function FunctionShipping() {
                     });
                   }}>
                     Create your delivery customization
-                  </Button>&nbsp;
-                  <Badge tone='info'>Result: <APIResult res={result} loading={accessing} /></Badge>
-                </List.Item>
-                <List.Item>
-                  Go to <Link url={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</Link> to check if the customization is created and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to see how your customization works with your input zip code.
-                </List.Item>
-              </List>
-            </Layout.Section>
-          </Layout>
-        </Card>
-      </BlockStack>
-    </Page>
+                  </s-button>&nbsp;
+                  <s-badge tone='info'>Result: <APIResult res={result} loading={accessing} /></s-badge>
+                </s-list-item>
+                <s-list-item>
+                  Go to <s-link href={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</s-link> to check if the customization is created and visit <s-link href={`https://${shop}`} target="_blank">your theme storefront</s-link> to see how your customization works with your input zip code.
+                </s-list-item>
+              </s-ordered-list>
+            </s-box>
+          </s-stack>
+        </s-section>
+      </s-stack>
+    </s-page>
   );
 }
 
 function APIResult(props) {
   if (props.loading) {
-    return <Spinner accessibilityLabel="Calling Order GraphQL" size="small" />;
+    return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
   }
   return (<span>{props.res}</span>);
 }

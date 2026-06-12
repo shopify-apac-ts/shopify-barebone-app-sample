@@ -1,7 +1,7 @@
 import { index, layout, route } from '@react-router/dev/routes';
 
 export default [
-  layout('components/AppShell.jsx', [
+  layout('AppShell.jsx', [
     index('routes/index.jsx'),
     route('auth', 'routes/auth.jsx'),
     route('sessiontoken', 'routes/sessiontoken.jsx'),

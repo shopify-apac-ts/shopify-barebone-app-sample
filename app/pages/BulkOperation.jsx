@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
-import { Page, Card, Layout, Link, Badge, Text, Spinner, List, BlockStack, Button, Label, Form, ButtonGroup } from '../components/PolarisWeb';
+import { authenticatedFetch } from "../utils/app-bridge";
+import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
 // Bulk opearation sample for product impporting with a file uploader.
@@ -62,22 +61,22 @@ function BulkOperation() {
     }, ['']);
 
     return (
-        <Page title="Bulk operation sample for product importing with a file uploader">
-            <BlockStack gap="500">
-                <Card sectioned={true}>
-                    <Link url="https://shopify.dev/docs/api/usage/bulk-operations/imports" target="_blank">Dev. doc</Link>
+        <s-page heading="Bulk operation sample for product importing with a file uploader">
+            <s-stack direction="block" gap="large">
+                <s-section>
+                    <s-link href="https://shopify.dev/docs/api/usage/bulk-operations/imports" target="_blank">Dev. doc</s-link>
                     <br /><br />
-                    <List type="number">
-                        <List.Item>
+                    <s-ordered-list>
+                        <s-list-item>
                             <FileUploader data={data}></FileUploader>
                             <p>&nbsp;</p>
-                        </List.Item>
-                        <List.Item>
+                        </s-list-item>
+                        <s-list-item>
                             <p>
-                                Run the bulk operation for product creations from the uploaded file above with the key: <Badge>{key}</Badge> which is generated initially while loading this page.
+                                Run the bulk operation for product creations from the uploaded file above with the key: <s-badge>{key}</s-badge> which is generated initially while loading this page.
                             </p>
                             <p>&nbsp;</p>
-                            <Button variant="primary" onClick={() => {
+                            <s-button variant="primary" onClick={() => {
                                 setAccessing(true);
                                 authenticatedFetch(`/bulkoperation?key=${key}`).then((response) => {
                                     response.json().then((json) => {
@@ -96,30 +95,30 @@ function BulkOperation() {
                                 });
                             }}>
                                 Run the operation
-                            </Button>&nbsp;
-                            <Badge tone='info'>Result: <APIResult2 res={result} loading={accessing} /></Badge>
+                            </s-button>&nbsp;
+                            <s-badge tone='info'>Result: <APIResult2 res={result} loading={accessing} /></s-badge>
                             <p>&nbsp;</p>
-                        </List.Item>
-                        <List.Item>
+                        </s-list-item>
+                        <s-list-item>
                             <p>
-                                After the operation started, you can check the latest status with <Link url={`https://shopify.dev/docs/api/admin-graphql/unstable/objects/queryroot#field-queryroot-currentbulkoperation`} target="_blank">
-                                    currentBulkOperation query</Link> and seeing <Link url={`https://${ getAdminFromShop(shop)}/products`} target="_blank">Products</Link>.
+                                After the operation started, you can check the latest status with <s-link href={`https://shopify.dev/docs/api/admin-graphql/unstable/objects/queryroot#field-queryroot-currentbulkoperation`} target="_blank">
+                                    currentBulkOperation query</s-link> and seeing <s-link href={`https://${ getAdminFromShop(shop)}/products`} target="_blank">Products</s-link>.
                             </p>
                             <p>&nbsp;</p>
-                            <Button variant="primary" onClick={() => {
+                            <s-button variant="primary" onClick={() => {
                                 showStatus();
                             }}>
                                 Check the latest status
-                            </Button>
+                            </s-button>
                             <p>&nbsp;</p>
                             <p>
                                 <b>The last operation:</b>
-                                &nbsp; {url != null ? <Link url={url} target="_blank">Result data</Link> : ''}
-                                &nbsp; {pUrl != null ? <Link url={pUrl} target="_blank">Partial data</Link> : ''}
+                                &nbsp; {url != null ? <s-link href={url} target="_blank">Result data</s-link> : ''}
+                                &nbsp; {pUrl != null ? <s-link href={pUrl} target="_blank">Partial data</s-link> : ''}
                             </p>
                             <APIResult res={res} />
                             <p>&nbsp;</p>
-                            <Button variant="primary" onClick={() => {
+                            <s-button variant="primary" onClick={() => {
                                 setRes(``);
                                 authenticatedFetch(`/bulkoperation?id=${id}`).then((response) => {
                                     response.json().then((json) => {
@@ -131,62 +130,62 @@ function BulkOperation() {
                                 showStatus();
                             }}>
                                 Cancel the current operation
-                            </Button>
+                            </s-button>
                             <p>&nbsp;</p>
-                        </List.Item>
-                    </List>
-                </Card>
-                <Card sectioned={true}>
-                    <List type="bullet">
-                        <List.Item>
+                        </s-list-item>
+                    </s-ordered-list>
+                </s-section>
+                <s-section>
+                    <s-unordered-list>
+                        <s-list-item>
                             <p>
-                                For <b>data export with queries</b>, you can test it out reading <Link url={`https://shopify.dev/docs/api/usage/bulk-operations/queries`} target="_blank">the dev. doc</Link> with <Link url={`https://shopify.dev/docs/apps/tools/graphiql-admin-api`} target="_blank">Shopify Admin API GraphiQL Explorer</Link>.
+                                For <b>data export with queries</b>, you can test it out reading <s-link href={`https://shopify.dev/docs/api/usage/bulk-operations/queries`} target="_blank">the dev. doc</s-link> with <s-link href={`https://shopify.dev/docs/apps/tools/graphiql-admin-api`} target="_blank">Shopify Admin API GraphiQL Explorer</s-link>.
                             </p>
-                        </List.Item>
-                    </List>
-                </Card>
-            </BlockStack>
-        </Page>
+                        </s-list-item>
+                    </s-unordered-list>
+                </s-section>
+            </s-stack>
+        </s-page>
     );
 }
 
 function FileUploader(props) {
     if (Object.keys(props.data).length === 0) {
-        return <Spinner accessibilityLabel="Calling Order GraphQL" size="large" />;
+        return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
     }
     const target = props.data.data.stagedUploadsCreate.stagedTargets[0];
     return (
-        <form action={`${target.url}`} method="post" enctype="multipart/form-data" target="_blank">
+        <form action={`${target.url}`} method="post" encType="multipart/form-data" target="_blank">
             {
                 target.parameters.map((param) => {
-                    return <input type="hidden" name={param.name} value={param.value} />
+                    return <input key={param.name} type="hidden" name={param.name} value={param.value} />
                 })
             }
             <p>
-                Upload your product JSONL file to import. (<Link url={new URL('../assets/sample.jsonl', import.meta.url).href} target="_blank">Sample</Link>)
+                Upload your product JSONL file to import. (<s-link href={new URL('../assets/sample.jsonl', import.meta.url).href} target="_blank">Sample</s-link>)
             </p>
             <p>
-                Your JSONL file needs to have each line in <Link url={`https://shopify.dev/docs/api/admin-graphql/unstable/mutations/productcreate`} target="_blank">productCreate mutation variables</Link> format and you can convert JSON to JSONL in
-                some useful sites like <Link url={`https://tableconvert.com/json-to-jsonlines`} target="_blank">this</Link>.
+                Your JSONL file needs to have each line in <s-link href={`https://shopify.dev/docs/api/admin-graphql/unstable/mutations/productcreate`} target="_blank">productCreate mutation variables</s-link> format and you can convert JSON to JSONL in
+                some useful sites like <s-link href={`https://tableconvert.com/json-to-jsonlines`} target="_blank">this</s-link>.
             </p>
             <br />
-            <input type="file" name="file" />
+            <s-drop-zone label="Product JSONL file" name="file" accept=".jsonl"></s-drop-zone>
             <br /><br />
-            <button style={{ "font-size": "large" }} type="submit">Upload</button>
+            <s-button variant="primary" type="submit">Upload</s-button>
         </form>
     );
 }
 
 function APIResult(props) {
     if (Object.keys(props.res).length === 0) {
-        return <Spinner accessibilityLabel="Calling Order GraphQL" size="large" />;
+        return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
     }
     return (<pre>{props.res}</pre>);
 }
 
 function APIResult2(props) {
     if (props.loading) {
-        return <Spinner accessibilityLabel="Calling Order GraphQL" size="small" />;
+        return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
     }
     return (<span>{props.res}</span>);
 }

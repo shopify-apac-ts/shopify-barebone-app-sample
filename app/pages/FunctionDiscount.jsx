@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction, useAppBridge } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getAdminFromShop, getCurrentHost, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
-import { Page, Card, Layout, Link, List, Badge, TextField, Button, Spinner, BlockStack } from '../components/PolarisWeb';
+import { authenticatedFetch } from "../utils/app-bridge";
+import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
 // Shopify Functions for discounts sample
@@ -22,52 +21,40 @@ function FunctionDiscount() {
   const [accessing, setAccessing] = useState(false);
 
   return (
-    <Page title="Create your original order discount with Shopify Functions">
-      <BlockStack gap="500">
-        <Card sectioned={true} >
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/api/functions/reference/order-discounts/" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <List type="number">
-                <List.Item>Add <Link url={`https://${ getAdminFromShop(shop)}/settings/custom_data`} target="_blank">Metafields</Link> for <Badge tone='info'>Customers</Badge>
-                  in type of <Badge>Integer</Badge> and input your Metafield <Badge>Namespace and key</Badge>
-                  <TextField
-                    label=""
-                    value={meta}
-                    onChange={metaChange}
-                    autoComplete="off"
-                    placeholder="Example: barebone_app.discount_rate"
-                  />
-                </List.Item>
-                <List.Item>
-                  Set the Metafields to <Link url={`https://${ getAdminFromShop(shop)}/customers`} target="_blank">Customers</Link> to specify how much discounted they get as a number
+    <s-page heading="Create your original order discount with Shopify Functions">
+      <s-stack direction="block" gap="large">
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/api/functions/reference/order-discounts/" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-ordered-list>
+                <s-list-item>Add <s-link href={`https://${ getAdminFromShop(shop)}/settings/custom_data`} target="_blank">Metafields</s-link> for <s-badge tone='info'>Customers</s-badge>
+                  in type of <s-badge>Integer</s-badge> and input your Metafield <s-badge>Namespace and key</s-badge>
+                  <s-text-field label="" value={meta} onInput={(event) => metaChange(event.currentTarget.value)} placeholder="Example: barebone_app.discount_rate"></s-text-field>
+                </s-list-item>
+                <s-list-item>
+                  Set the Metafields to <s-link href={`https://${ getAdminFromShop(shop)}/customers`} target="_blank">Customers</s-link> to specify how much discounted they get as a number
                   (e.g. 30 = 30% discounted)
-                </List.Item>
-              </List>
-            </Layout.Section>
-          </Layout>
-        </Card>
-        <Card sectioned={true}>
-          <Layout>
-            <Layout.Section>
-              <Link url="https://shopify.dev/api/admin-graphql/2023-04/mutations/discountAutomaticAppCreate" target="_blank">Dev. doc</Link>
-            </Layout.Section>
-            <Layout.Section>
-              <List type="number">
-                <List.Item>
-                  Input your <Badge>Shopify Functions ID (uid)</Badge> in <Badge>extensions/my-function-discount-ext/shopify.extension.toml</Badge> or <Link url="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</Link>
-                  <TextField
-                    label=""
-                    value={id}
-                    onChange={idChange}
-                    autoComplete="off"
-                    placeholder="Example: 0eb42b0c-f71e-4956-bca2-485b6442ccad"
-                  />
-                </List.Item>
-                <List.Item>
-                  <Button variant="primary" onClick={() => {
+                </s-list-item>
+              </s-ordered-list>
+            </s-box>
+          </s-stack>
+        </s-section>
+        <s-section>
+          <s-stack direction="block" gap="base">
+            <s-box>
+              <s-link href="https://shopify.dev/api/admin-graphql/2023-04/mutations/discountAutomaticAppCreate" target="_blank">Dev. doc</s-link>
+            </s-box>
+            <s-box>
+              <s-ordered-list>
+                <s-list-item>
+                  Input your <s-badge>Shopify Functions ID (uid)</s-badge> in <s-badge>extensions/my-function-discount-ext/shopify.extension.toml</s-badge> or <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</s-link>
+                  <s-text-field label="" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: 0eb42b0c-f71e-4956-bca2-485b6442ccad"></s-text-field>
+                </s-list-item>
+                <s-list-item>
+                  <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-01/mutations/discountAutomaticAppCreate"
                     authenticatedFetch(`/functiondiscount?meta=${meta}&id=${id}`).then((response) => {
@@ -87,24 +74,24 @@ function FunctionDiscount() {
                     });
                   }}>
                     Register your discount
-                  </Button>&nbsp;
-                  <Badge tone='info'>Result: <APIResult res={result} loading={accessing} /></Badge>
-                </List.Item>
-                <List.Item>
-                  Go to <Link url={`https://${ getAdminFromShop(shop)}/discounts`} target="_blank">Discounts</Link> to check if the discount is activated and visit <Link url={`https://${shop}`} target="_blank">your theme storefront</Link> to see how your discount works with your specified customers
-                </List.Item>
-              </List>
-            </Layout.Section>
-          </Layout>
-        </Card>
-      </BlockStack>
-    </Page>
+                  </s-button>&nbsp;
+                  <s-badge tone='info'>Result: <APIResult res={result} loading={accessing} /></s-badge>
+                </s-list-item>
+                <s-list-item>
+                  Go to <s-link href={`https://${ getAdminFromShop(shop)}/discounts`} target="_blank">Discounts</s-link> to check if the discount is activated and visit <s-link href={`https://${shop}`} target="_blank">your theme storefront</s-link> to see how your discount works with your specified customers
+                </s-list-item>
+              </s-ordered-list>
+            </s-box>
+          </s-stack>
+        </s-section>
+      </s-stack>
+    </s-page>
   );
 }
 
 function APIResult(props) {
   if (props.loading) {
-    return <Spinner accessibilityLabel="Calling Order GraphQL" size="small" />;
+    return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
   }
   return (<span>{props.res}</span>);
 }
