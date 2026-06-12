@@ -22,25 +22,67 @@ export async function authenticatedFetch(url, options = {}) {
   });
 }
 
-export async function openRemote(url, newContext = false) {
+function isAbsoluteHttpUrl(url) {
+  try {
+    return ["http:", "https:"].includes(new URL(url).protocol);
+  } catch {
+    return false;
+  }
+}
+
+function openBrowserTab(url) {
+  const opened = window.open(url, "_blank");
+  if (opened) {
+    try {
+      opened.opener = null;
+    } catch {
+      // Some browsers restrict opener changes after navigation starts.
+    }
+    return;
+  }
+  return false;
+}
+
+async function openWithTarget(url, target) {
   const shopify = useAppBridge();
+  if (target === "_blank") {
+    if (openBrowserTab(url) !== false) return;
+    if (shopify?.open) {
+      await shopify.open(url, "_blank");
+      return;
+    }
+    window.location.assign(url);
+    return;
+  }
   if (shopify?.open) {
-    await shopify.open(url, newContext ? undefined : "_self");
+    await shopify.open(url, target);
     return;
   }
   window.location.assign(url);
+}
+
+async function openEmbedded(url) {
+  await openWithTarget(url, "_self");
+}
+
+export async function openRemote(url, newContext = false) {
+  if (newContext || isAbsoluteHttpUrl(url)) {
+    await openWithTarget(url, "_blank");
+    return;
+  }
+  await openEmbedded(url);
 }
 
 export function navigateApp(path) {
   window.location.assign(path);
 }
 
-export function navigateAdmin(path, newContext = true) {
+export function navigateAdmin(path) {
   const shop = getShopFromLocation();
   const target = shop && path.startsWith("/")
     ? `https://${getAdminFromShop(shop)}${path}`
     : path;
-  return openRemote(target, newContext);
+  return openEmbedded(target);
 }
 
 export function decodeSessionToken(sessionToken) {
@@ -70,7 +112,7 @@ export function createRedirect() {
       }
       if (action === RedirectAction.ADMIN_PATH) {
         const path = typeof payload === "string" ? payload : payload.path;
-        navigateAdmin(path, Boolean(payload?.newContext));
+        navigateAdmin(path);
       }
     },
   };
