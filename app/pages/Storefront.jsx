@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
-import { getCurrentHost, getShopFromLocation } from "../utils/shop";
+import { getShopFromLocation } from "../utils/shop";
 
 
 // Storefront API sample
@@ -12,6 +12,19 @@ function Storefront() {
 
   const [result, setResult] = useState({});
   const [accessing, setAccessing] = useState(false);
+
+  const openStorefrontPage = () => {
+    const targetShop = shop || result.shop;
+    if (!targetShop) return;
+    const storefrontUrl = new URL('/storefront', window.location.origin);
+    storefrontUrl.searchParams.set('shop', targetShop);
+    const publicToken = result.public_token?.accessToken || '';
+    if (publicToken) storefrontUrl.searchParams.set('public_token', publicToken);
+    redirect.dispatch(RedirectAction.REMOTE, {
+      url: storefrontUrl.toString(),
+      newContext: true,
+    });
+  };
 
   return (
     <s-page heading="Storefront API sample with Cart API, tokenless access, and Customer Account API">
@@ -58,7 +71,7 @@ function Storefront() {
                 <s-list-item>
                   Open the <s-link href="#" onClick={(event) => {
                     event.preventDefault();
-                    redirect.dispatch(RedirectAction.REMOTE, { url: `https://${getCurrentHost()}/storefront?shop=${shop}&public_token=${result.public_token.accessToken}`, newContext: true });
+                    openStorefrontPage();
                   }}>plain custom storefront page
                   </s-link> using Cart API, tokenless access, and Customer Account API login.
                 </s-list-item>

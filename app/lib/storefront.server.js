@@ -27,6 +27,18 @@ const STOREFRONT_TOKEN_CREATE = `mutation StorefrontAccessTokenCreate($input: St
   }
 }`;
 
+const STOREFRONT_TOKENS_QUERY = `query StorefrontAccessTokens {
+  shop {
+    storefrontAccessTokens(first: 100) {
+      nodes {
+        accessToken
+        id
+        title
+      }
+    }
+  }
+}`;
+
 const DELEGATE_TOKEN_CREATE = `mutation DelegateAccessTokenCreate($input: DelegateAccessTokenInput!) {
   delegateAccessTokenCreate(input: $input) {
     delegateAccessToken {
@@ -263,6 +275,7 @@ const DELIVERY_OPTION_MUTATION = `mutation StorefrontCartSelectedDeliveryOptions
 
 export async function prepareStorefrontAccess(shop, origin) {
   const response = {
+    shop,
     public_token: '',
     private_token: '',
     tokenless_url: `https://${shop}/api/${API_VERSION}/graphql.json`,
@@ -277,11 +290,21 @@ export async function prepareStorefrontAccess(shop, origin) {
       title: 'Barebone App Storefront',
     },
   });
-  if (result.data.storefrontAccessTokenCreate.userErrors.length > 0) {
+  const tokenCreate = result.data?.storefrontAccessTokenCreate;
+  if (tokenCreate == null) {
     response.error_count += 1;
-    response.error_messages.push(`storefrontAccessTokenCreate: ${JSON.stringify(result.data.storefrontAccessTokenCreate.userErrors[0])}`);
+    response.error_messages.push(`storefrontAccessTokenCreate: ${JSON.stringify(result.errors || result)}`);
+  } else if (tokenCreate.userErrors.length > 0) {
+    const existingToken = await getExistingStorefrontToken(shop);
+    if (existingToken != null) {
+      response.public_token = existingToken;
+      response.error_messages.push(`storefrontAccessTokenCreate skipped: ${JSON.stringify(tokenCreate.userErrors[0])}`);
+    } else {
+      response.error_count += 1;
+      response.error_messages.push(`storefrontAccessTokenCreate: ${JSON.stringify(tokenCreate.userErrors[0])}`);
+    }
   } else {
-    response.public_token = result.data.storefrontAccessTokenCreate.storefrontAccessToken;
+    response.public_token = tokenCreate.storefrontAccessToken;
   }
 
   result = await callAdminGraphql(shop, DELEGATE_TOKEN_CREATE, {
@@ -321,6 +344,12 @@ export async function prepareStorefrontAccess(shop, origin) {
   }
 
   return response;
+}
+
+async function getExistingStorefrontToken(shop) {
+  const result = await callAdminGraphql(shop, STOREFRONT_TOKENS_QUERY);
+  const tokens = result.data?.shop?.storefrontAccessTokens?.nodes || [];
+  return tokens.find((token) => token.title === 'Barebone App Storefront') || tokens[0] || null;
 }
 
 export async function renderStorefrontPage(request, { shop, publicToken }) {

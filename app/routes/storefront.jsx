@@ -34,8 +34,8 @@ export async function loader({ request }) {
   }
 
   const shop = url.searchParams.get('shop');
-  const publicToken = url.searchParams.get('public_token');
-  if (shop && publicToken != null) {
+  const publicToken = url.searchParams.get('public_token') || '';
+  if (shop) {
     return renderStorefrontPage(request, { shop, publicToken });
   }
 
