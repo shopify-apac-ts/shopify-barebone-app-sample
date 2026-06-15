@@ -78,9 +78,9 @@ export function createOAuthAuthorizeUrl(shop, origin) {
   const shopDomain = normalizeShopDomain(shop);
   const redirectUrl = new URL(`https://${shopDomain}/admin/oauth/authorize`);
   redirectUrl.searchParams.set('client_id', API_KEY);
-  redirectUrl.searchParams.set('scope', ACCESS_SCOPES);
   redirectUrl.searchParams.set('redirect_uri', `${origin}/callback`);
   redirectUrl.searchParams.set('state', '');
+  redirectUrl.searchParams.append('grant_options[]', '');
   return redirectUrl.toString();
 }
 
