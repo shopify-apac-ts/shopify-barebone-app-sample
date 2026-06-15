@@ -8,8 +8,14 @@ import {
 } from 'react-router';
 import styles from './styles.css?url';
 import { API_KEY } from './lib/env.server.js';
+import { logAppBridgeConfig } from './utils/app-bridge-diagnostics.js';
 
 export const links = () => [{ rel: 'stylesheet', href: styles }];
+
+export const clientLoader = () => {
+  logAppBridgeConfig();
+  return null;
+};
 
 export function loader() {
   return { apiKey: API_KEY || '' };
