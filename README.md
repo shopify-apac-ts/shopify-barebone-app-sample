@@ -14,7 +14,7 @@ app/ ... React Router route modules, UI pages written directly with Polaris and 
 
   ./root.jsx ... React Router HTML shell that loads App Bridge and Polaris web components from Shopify CDN.
   ./AppShell.jsx ... Embedded app shell using App Bridge web components for the title bar and app navigation.
-  ./routes/ ... HTTP entry points. Each route is intentionally thin and points to one Shopify sample concept.
+  ./routes/ ... HTTP entry points. Each route is intentionally thin and points to one Shopify sample concept. Embedded HTML routes export headers from `app/lib/http.server.js` so Shopify iframe protection is applied.
   ./pages/ ... Embedded app UI pages rendered by React Router with Polaris web components used directly in each page.
   ./lib/ ... Server-side Shopify API helpers, grouped by learning topic.
   ./utils/ ... Browser-side App Bridge and URL helpers used by UI pages.
@@ -45,9 +45,10 @@ For extensions like Theme App Extensinons, Shopify Functions, and Checkout UI Ex
 If you are new to this sample, start from these files instead of reading the repository from top to bottom.
 
 - Embedded admin UI: start with `app/root.jsx`. This file loads App Bridge and Polaris web components from Shopify CDN, so pages can use tags like `<s-page>` and `<s-button>` directly. Then read `app/AppShell.jsx` for the App Bridge title bar and app navigation, and `app/pages/Index.jsx` for the first embedded UI screen.
-- OAuth and embedded app entry: read `app/routes/index.jsx` and `app/routes/auth.jsx` first. `index.jsx` reuses the auth loader, and `auth.jsx` verifies embedded requests, checks installation state, and starts OAuth when the shop has not installed the app yet. Continue to `app/routes/auth.callback.jsx` and `app/lib/oauth.server.js` to see the access token exchange and storage flow.
+- OAuth and embedded app entry: read `app/routes/index.jsx` and `app/routes/auth.jsx` first. `index.jsx` reuses the auth loader, and `auth.jsx` verifies embedded requests, checks installation state, applies Shopify iframe protection, and starts OAuth when the shop has not installed the app yet. Continue to `app/routes/auth.callback.jsx` and `app/lib/oauth.server.js` to see the access token exchange and storage flow.
 - Server-side sample endpoints: read the thin route modules under `app/routes/` together with the matching topic helpers under `app/lib/`. For example, `app/routes/storefront.jsx` points to Storefront API and Customer Account API helpers, while `app/routes/sessiontoken.jsx` points to session token validation helpers.
 - Browser-side App Bridge helpers: read `app/utils/app-bridge.js` for ID token retrieval, authenticated fetches, embedded navigation, and external tab handling used by the admin UI pages.
+- Iframe protection: read `app/lib/http.server.js`, `app/lib/embedded.server.js`, and `app/lib/shopify-auth.server.js`. Embedded HTML pages return a shop-specific `Content-Security-Policy: frame-ancestors https://{shop} https://admin.shopify.com;` header, while standalone HTML pages use `frame-ancestors 'none';`.
 - Checkout, customer account, POS, web pixel, theme, and function customizations: read the matching directories under `extensions/`. These are deployed by Shopify CLI, even though the main app server is hand-written with React Router.
 - Plain custom storefront sample: read `views/storefront.html` after `app/routes/storefront.jsx` if you want to follow Cart API, tokenless Storefront API access, and Customer Account API login outside the embedded admin UI.
 
