@@ -62,6 +62,7 @@ If you are new to this sample, start from these files instead of reading the rep
     SHOPIFY_API_KEY:              YOUR_API_KEY (Copy and paste from your app settings in partner dashboard)
     SHOPIFY_API_SECRET:           YOUR_API_SECRET (Copy and paste from your app settings in partner dashboard)
     SHOPIFY_API_VERSION:          2026-04
+    SHOPIFY_SCOPES:               Optional. Comma-separated Admin API scopes. If omitted, the sample uses the same default scopes as the included shopify.app.toml file.
 
     // Required for the Storefront API sample's Customer Account API login flow.
     SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID: YOUR_CUSTOMER_ACCOUNT_API_CLIENT_ID
@@ -146,7 +147,7 @@ If you are new to this sample, start from these files instead of reading the rep
 
 # How to install
 Access to the following endpoit.
-`https://SHOPIFY_SHOP_DOMAIN/admin/oauth/authorize?client_id=YOUR_API_KEY&redirect_uri=YOUR_APP_URL/callback&state=&grant_options[]=`　
+`https://SHOPIFY_SHOP_DOMAIN/admin/oauth/authorize?client_id=YOUR_API_KEY&scope=YOUR_COMMA_SEPARATED_SCOPES&redirect_uri=YOUR_APP_URL/callback&state=`
 
 Or 
 
@@ -155,6 +156,7 @@ you can install to your development stores from the app home `Install app` butto
 # How to update
 - For app UI or server-side updates (`app/` or `views`), run the build command (`pnpm run build`) and start command (`pnpm run start`) again. Some cloud services like Render enable it with `git commit & git push`.
 - If you change the value of `SHOPIFY_API_KEY`, you need to build again because `app/root.jsx` writes it into the App Bridge meta tag. Some cloud services like Render enable it with `git commit & git push`.
+- If you change `SHOPIFY_API_KEY` or switch the app connected to this source code, the OAuth access tokens already stored in the `shops` DB collection belong to the previous app client. Reload the embedded app so OAuth runs again and stores a fresh token for the current app. A Shopify Admin GraphQL 401 with `Invalid API key or access token` usually means the DB returned a stored token, but Shopify rejected that token; it is not the same symptom as a missing MongoDB connection.
 - For extension update (`extensions`), run `shopify app deploy` again. This needs to be done in your local (development) PC, not in the cloud hosting service.  If you change the value of `SHOPIFY_API_KEY`, you need to deploy again with the toml file updated as described below.
 - For adding a new extension under `extensions`, run `shopify app generate extension` to choose your prefered one with a template. 
 
