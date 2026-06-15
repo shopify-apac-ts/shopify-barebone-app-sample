@@ -25,6 +25,12 @@ export function redirect(location, status = 302) {
   });
 }
 
+export function oauthBounceUrl(request) {
+  const url = new URL(request.url);
+  url.searchParams.delete('embedded');
+  return `${url.pathname}${url.search}`;
+}
+
 export function htmlSecurityHeaders(shop, embedded) {
   return {
     'Content-Security-Policy': contentSecurityPolicy(shop, embedded),

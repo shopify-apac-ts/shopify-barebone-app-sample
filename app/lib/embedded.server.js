@@ -2,6 +2,8 @@ import {
   embeddedHtmlData,
   htmlSecurityHeaders,
   json,
+  oauthBounceUrl,
+  redirect,
   topLevelRedirect,
   verifyEmbeddedRequest,
 } from './http.server.js';
@@ -27,7 +29,10 @@ export async function embeddedPageLoader({ request, allowAuthenticatedFetch = fa
 
   const { shop } = verified;
   if (!(await hasValidInstallation(shop))) {
-    return topLevelRedirect(createOAuthAuthorizeUrl(shop, getPublicOrigin(request)), htmlSecurityHeaders(shop, true));
+    if (verified.params.get('embedded') === '1') {
+      return topLevelRedirect(oauthBounceUrl(request), htmlSecurityHeaders(shop, true));
+    }
+    return redirect(createOAuthAuthorizeUrl(shop, getPublicOrigin(request)));
   }
   return embeddedHtmlData(shop);
 }

@@ -1,6 +1,7 @@
 import {
   embeddedHtmlData,
   htmlSecurityHeaders,
+  oauthBounceUrl,
   redirect,
   routeHeaders,
   topLevelRedirect,
@@ -31,7 +32,12 @@ export async function loader({ request }) {
   if (!validInstallation) {
     const authorizeUrl = createOAuthAuthorizeUrl(shop, getPublicOrigin(request));
     console.info('[auth] oauth required', JSON.stringify({ shop, authorizeUrl }));
-    return topLevelRedirect(authorizeUrl, htmlSecurityHeaders(shop, true));
+    if (isEmbedded(params)) {
+      const bounceUrl = oauthBounceUrl(request);
+      console.info('[auth] escaping iframe before oauth', JSON.stringify({ shop, bounceUrl }));
+      return topLevelRedirect(bounceUrl, htmlSecurityHeaders(shop, true));
+    }
+    return redirect(authorizeUrl);
   }
 
   if (!isEmbedded(params)) {
