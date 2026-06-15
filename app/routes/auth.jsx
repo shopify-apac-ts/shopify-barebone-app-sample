@@ -18,9 +18,20 @@ export async function loader({ request }) {
   if (!verified.ok) return verified.response;
 
   const { params, shop } = verified;
-  if (!(await hasValidInstallation(shop))) {
+  const validInstallation = await hasValidInstallation(shop);
+  console.info('[auth] embedded request', JSON.stringify({
+    method: request.method,
+    path: new URL(request.url).pathname,
+    shop,
+    embedded: params.get('embedded') || '',
+    validInstallation,
+  }));
+
+  if (!validInstallation) {
     const url = new URL(request.url);
-    return topLevelRedirect(createOAuthAuthorizeUrl(shop, url.origin), htmlSecurityHeaders(shop, true));
+    const authorizeUrl = createOAuthAuthorizeUrl(shop, url.origin);
+    console.info('[auth] oauth required', JSON.stringify({ shop, authorizeUrl }));
+    return topLevelRedirect(authorizeUrl, htmlSecurityHeaders(shop, true));
   }
 
   if (!isEmbedded(params)) {

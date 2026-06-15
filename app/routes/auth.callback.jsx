@@ -16,12 +16,27 @@ export async function loader({ request }) {
     return new Response('Missing or invalid shop or code', { status: 400 });
   }
 
+  console.info('[oauth] callback received', JSON.stringify({ shop, hasCode: Boolean(code) }));
+
   const tokenResponse = await exchangeOAuthCode(shop, code);
   if (!tokenResponse.access_token) {
     return new Response('Shopify did not return an access token', { status: 502 });
   }
+  console.info('[oauth] token exchange succeeded', JSON.stringify({
+    shop,
+    tokenPresent: true,
+    tokenLength: tokenResponse.access_token.length,
+    scope: tokenResponse.scope || '',
+  }));
 
-  await upsertShopData(shop, buildStoredShopData(shop, tokenResponse));
+  try {
+    await upsertShopData(shop, buildStoredShopData(shop, tokenResponse));
+    console.info('[oauth] shop data stored', JSON.stringify({ shop }));
+  } catch (error) {
+    console.error('[oauth] shop data store failed', JSON.stringify({ shop, message: error.message }));
+    throw error;
+  }
+
   const appHandle = await getAppHandle(shop, tokenResponse.access_token);
   if (!appHandle) {
     return new Response('Unable to resolve app handle', { status: 502 });

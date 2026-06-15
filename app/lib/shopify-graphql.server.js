@@ -29,6 +29,14 @@ export async function callStorefrontGraphql(shop, query, variables, token, buyer
 }
 
 async function callShopifyGraphql(endpoint, query, variables, headers, context = {}) {
+  console.info('[shopify-graphql] request', JSON.stringify({
+    apiName: context.apiName || 'Shopify GraphQL',
+    endpoint,
+    operation: getGraphqlOperationName(query),
+    query: compactGraphql(query),
+    variables: redactGraphqlVariables(variables),
+  }));
+
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -42,6 +50,14 @@ async function callShopifyGraphql(endpoint, query, variables, headers, context =
     }),
   });
   const json = await response.json();
+  console.info('[shopify-graphql] response', JSON.stringify({
+    apiName: context.apiName || 'Shopify GraphQL',
+    endpoint,
+    operation: getGraphqlOperationName(query),
+    status: response.status,
+    ok: response.ok,
+  }));
+
   if (!response.ok) {
     const prefix = context.apiName || 'Shopify GraphQL';
     const shopHint = context.shop ? ` for ${context.shop}` : '';
@@ -54,4 +70,30 @@ async function callShopifyGraphql(endpoint, query, variables, headers, context =
     throw error;
   }
   return json;
+}
+
+function compactGraphql(query) {
+  return String(query || '').replace(/\s+/g, ' ').trim();
+}
+
+function getGraphqlOperationName(query) {
+  return compactGraphql(query).match(/\b(query|mutation)\s+([A-Za-z0-9_]+)/)?.[2] || '';
+}
+
+function redactGraphqlVariables(value, key = '') {
+  if (value == null) return value;
+  if (/token|secret|password|authorization/i.test(key)) return '[redacted]';
+  if (Array.isArray(value)) return value.map((item) => redactGraphqlVariables(item));
+  if (typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([entryKey, entryValue]) => [
+        entryKey,
+        redactGraphqlVariables(entryValue, entryKey),
+      ]),
+    );
+  }
+  if (typeof value === 'string' && value.length > 300) {
+    return `${value.slice(0, 300)}...`;
+  }
+  return value;
 }

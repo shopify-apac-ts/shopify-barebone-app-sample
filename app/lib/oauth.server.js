@@ -29,11 +29,22 @@ export async function hasValidInstallation(shop) {
   const shopDomain = normalizeShopDomain(shop);
   if (!shopDomain) return false;
   const shopData = await getShopData(shopDomain);
-  if (!isCurrentAppInstallation(shopData)) return false;
+  const currentAppInstallation = isCurrentAppInstallation(shopData);
+  console.info('[oauth] stored installation', JSON.stringify({
+    shop: shopDomain,
+    ...summarizeShopData(shopData),
+    currentAppInstallation,
+  }));
+  if (!currentAppInstallation) return false;
   try {
     const response = await callAdminGraphql(shopDomain, SHOP_QUERY);
     return response.data?.shop?.name != null && response.data?.app?.handle != null;
-  } catch (_error) {
+  } catch (error) {
+    console.info('[oauth] stored token rejected', JSON.stringify({
+      shop: shopDomain,
+      status: error.status || null,
+      message: error.message,
+    }));
     return false;
   }
 }
@@ -86,4 +97,17 @@ export function buildStoredShopData(shop, tokenResponse) {
 
 export function isCurrentAppInstallation(shopData) {
   return Boolean(shopData?.access_token && shopData.client_id === API_KEY);
+}
+
+function summarizeShopData(shopData) {
+  const accessToken = shopData?.access_token || '';
+  return {
+    exists: shopData != null,
+    clientId: shopData?.client_id || '',
+    legacyScope: shopData?.scope || '',
+    scopes: shopData?.scopes || '',
+    storedAt: shopData?.stored_at || '',
+    tokenPresent: Boolean(accessToken),
+    tokenLength: accessToken.length,
+  };
 }

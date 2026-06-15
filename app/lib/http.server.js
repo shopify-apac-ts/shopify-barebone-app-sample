@@ -1,5 +1,5 @@
 import { data } from 'react-router';
-import { CONTENT_TYPE_JSON } from './env.server.js';
+import { API_KEY, CONTENT_TYPE_JSON } from './env.server.js';
 import { contentSecurityPolicy, normalizeShopDomain, verifyShopifyHmac } from './shopify-auth.server.js';
 
 function hasHeaders(headers) {
@@ -43,12 +43,29 @@ export function routeHeaders({ actionHeaders, loaderHeaders }) {
 
 export function topLevelRedirect(location, headers = {}) {
   const safeLocation = JSON.stringify(location);
+  const safeApiKey = JSON.stringify(API_KEY || '');
   return new Response(
     `<!doctype html>
 <html>
   <head>
     <meta charset="utf-8">
-    <script>window.open(${safeLocation}, "_top");</script>
+    <meta name="shopify-api-key" content=${safeApiKey}>
+    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+    <script>
+      const target = ${safeLocation};
+      function fallbackRedirect() {
+        window.open(target, "_top");
+      }
+      function redirectTop() {
+        if (window.shopify && typeof window.shopify.open === "function") {
+          Promise.resolve(window.shopify.open(target, "_top")).catch(fallbackRedirect);
+          return;
+        }
+        fallbackRedirect();
+      }
+      window.addEventListener("load", redirectTop);
+      setTimeout(redirectTop, 300);
+    </script>
   </head>
   <body>
     <a href=${safeLocation} target="_top">Continue</a>
