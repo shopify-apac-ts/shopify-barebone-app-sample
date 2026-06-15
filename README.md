@@ -148,7 +148,7 @@ If you are new to this sample, start from these files instead of reading the rep
 
 # How to install
 Access to the following endpoit.
-`https://SHOPIFY_SHOP_DOMAIN/admin/oauth/authorize?client_id=YOUR_API_KEY&scope=YOUR_COMMA_SEPARATED_SCOPES&redirect_uri=YOUR_APP_URL/callback&state=`
+`https://SHOPIFY_SHOP_DOMAIN/admin/oauth/authorize?client_id=YOUR_API_KEY&redirect_uri=YOUR_APP_URL/callback&state=&grant_options[]=`
 
 Or 
 
