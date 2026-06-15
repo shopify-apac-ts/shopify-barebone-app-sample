@@ -20,13 +20,13 @@ export function AppShell() {
     <>
       <ui-title-bar title="Welcome to my barebone app"></ui-title-bar>
       <s-app-nav>
-        <s-link href="/" rel="home">
+        <a href="/" rel="home">
           Home
-        </s-link>
+        </a>
         {links.map(([label, href]) => (
-          <s-link key={href} href={href}>
+          <a key={href} href={href}>
             {label}
-          </s-link>
+          </a>
         ))}
       </s-app-nav>
       <Outlet />
