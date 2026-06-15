@@ -40,7 +40,10 @@ async function callShopifyGraphql(endpoint, query, variables, headers) {
   });
   const json = await response.json();
   if (!response.ok) {
-    throw new Error(`Shopify GraphQL failed ${response.status}: ${JSON.stringify(json)}`);
+    const error = new Error(`Shopify GraphQL failed ${response.status}: ${JSON.stringify(json)}`);
+    error.status = response.status;
+    error.body = json;
+    throw error;
   }
   return json;
 }

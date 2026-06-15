@@ -89,7 +89,7 @@ function SessionToken() {
                   you can use the session token validation for passing <s-badge tone="info">shop</s-badge> in a secure way as the following button does.
                 </s-list-item>
                 <s-list-item>
-                  If you add <s-badge>?external=true</s-badge> to <s-link href="https://shopify.dev/apps/deployment/web#step-5-update-urls-in-the-partner-dashboard" target="_blank">YOUR_APP_URL</s-link> (<s-badge>https://{getCurrentHost()}/?external=true</s-badge>),
+                  If you add <s-badge>?external=true</s-badge> to <s-link href={`https://${getCurrentHost()}`} target="_blank">YOUR_APP_URL</s-link> (<s-badge>https://{getCurrentHost()}/?external=true</s-badge>),
                   all pages redirect to the following button target which shows how <b>service connector app install flow</b> works.
                 </s-list-item>
               </s-unordered-list>

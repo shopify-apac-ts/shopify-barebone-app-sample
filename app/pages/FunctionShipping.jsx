@@ -34,10 +34,10 @@ function FunctionShipping() {
             <s-box>
               <s-ordered-list>
                 <s-list-item>Input a <s-badge>shipping rate name</s-badge> which you want to show only, from <s-link href={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</s-link>.
-                  <s-text-field label="" value={rate} onInput={(event) => rateChange(event.currentTarget.value)} placeholder="Example: Standard"></s-text-field>
+                  <s-text-field label="Shipping rate name" labelAccessibilityVisibility="exclusive" value={rate} onInput={(event) => rateChange(event.currentTarget.value)} placeholder="Example: Standard"></s-text-field>
                 </s-list-item>
                 <s-list-item>Input a <s-badge>zip code</s-badge> which buyers input in their shipping address when the shipping rate shows up above.
-                  <s-text-field label="" value={zip} onInput={(event) => zipChange(event.currentTarget.value)} placeholder="Example: 100-0001"></s-text-field>
+                  <s-text-field label="Shipping zip code" labelAccessibilityVisibility="exclusive" value={zip} onInput={(event) => zipChange(event.currentTarget.value)} placeholder="Example: 100-0001"></s-text-field>
                 </s-list-item>
               </s-ordered-list>
             </s-box>
@@ -52,7 +52,7 @@ function FunctionShipping() {
               <s-ordered-list>
                 <s-list-item>
                   Input your <s-badge>Shopify Functions ID (uid)</s-badge> in <s-badge>extensions/my-function-shipping-ext/shopify.extension.toml</s-badge> or <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</s-link>
-                  <s-text-field label="" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: 4269092f-36ee-46e5-85bf-86bea1c8ff51"></s-text-field>
+                  <s-text-field label="Shopify Function ID" labelAccessibilityVisibility="exclusive" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: 4269092f-36ee-46e5-85bf-86bea1c8ff51"></s-text-field>
                 </s-list-item>
                 <s-list-item>
                   <s-button variant="primary" onClick={() => {

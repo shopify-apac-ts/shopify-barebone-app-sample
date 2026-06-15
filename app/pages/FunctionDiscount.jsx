@@ -32,7 +32,7 @@ function FunctionDiscount() {
               <s-ordered-list>
                 <s-list-item>Add <s-link href={`https://${ getAdminFromShop(shop)}/settings/custom_data`} target="_blank">Metafields</s-link> for <s-badge tone='info'>Customers</s-badge>
                   in type of <s-badge>Integer</s-badge> and input your Metafield <s-badge>Namespace and key</s-badge>
-                  <s-text-field label="" value={meta} onInput={(event) => metaChange(event.currentTarget.value)} placeholder="Example: barebone_app.discount_rate"></s-text-field>
+                  <s-text-field label="Customer metafield namespace and key" labelAccessibilityVisibility="exclusive" value={meta} onInput={(event) => metaChange(event.currentTarget.value)} placeholder="Example: barebone_app.discount_rate"></s-text-field>
                 </s-list-item>
                 <s-list-item>
                   Set the Metafields to <s-link href={`https://${ getAdminFromShop(shop)}/customers`} target="_blank">Customers</s-link> to specify how much discounted they get as a number
@@ -51,7 +51,7 @@ function FunctionDiscount() {
               <s-ordered-list>
                 <s-list-item>
                   Input your <s-badge>Shopify Functions ID (uid)</s-badge> in <s-badge>extensions/my-function-discount-ext/shopify.extension.toml</s-badge> or <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</s-link>
-                  <s-text-field label="" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: 0eb42b0c-f71e-4956-bca2-485b6442ccad"></s-text-field>
+                  <s-text-field label="Shopify Function ID" labelAccessibilityVisibility="exclusive" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: 0eb42b0c-f71e-4956-bca2-485b6442ccad"></s-text-field>
                 </s-list-item>
                 <s-list-item>
                   <s-button variant="primary" onClick={() => {

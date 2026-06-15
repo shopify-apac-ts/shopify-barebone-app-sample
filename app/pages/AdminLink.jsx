@@ -90,7 +90,7 @@ function AdminLink() {
 }
 
 function APIResult(props) {
-    if (Object.keys(props.res).length === 0) {
+    if (props.res === '') {
         return <s-spinner accessibilityLabel="Calling Order GraphQL"></s-spinner>;
     }
     return (<pre>{props.res}</pre>);

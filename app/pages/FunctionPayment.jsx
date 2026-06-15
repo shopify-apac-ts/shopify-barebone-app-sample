@@ -34,10 +34,10 @@ function FunctionPayment() {
             <s-box>
               <s-ordered-list>
                 <s-list-item>Input a <s-badge>payment method name</s-badge> which you want to show only, from <s-link href={`https://${shop}`} target="_blank">your checkout page</s-link> (note that the method name needs to be <b>the buyer facing one</b>, not admin).
-                  <s-text-field label="" value={method} onInput={(event) => methodChange(event.currentTarget.value)} placeholder="Example: Cash on Delivery (COD)"></s-text-field>
+                  <s-text-field label="Payment method name" labelAccessibilityVisibility="exclusive" value={method} onInput={(event) => methodChange(event.currentTarget.value)} placeholder="Example: Cash on Delivery (COD)"></s-text-field>
                 </s-list-item>
                 <s-list-item>Input a <s-badge>shipping rate name</s-badge> which buyers select when the payment method shows up above, from <s-link href={`https://${ getAdminFromShop(shop)}/settings/shipping`} target="_blank">shipping settings</s-link> or <s-link href={`https://${ getAdminFromShop(shop)}/orders`} target="_blank">past orders</s-link>
-                  <s-text-field label="" value={rate} onInput={(event) => rateChange(event.currentTarget.value)} placeholder="Example: Standard"></s-text-field>
+                  <s-text-field label="Shipping rate name" labelAccessibilityVisibility="exclusive" value={rate} onInput={(event) => rateChange(event.currentTarget.value)} placeholder="Example: Standard"></s-text-field>
                 </s-list-item>
               </s-ordered-list>
             </s-box>
@@ -52,7 +52,7 @@ function FunctionPayment() {
               <s-ordered-list>
                 <s-list-item>
                   Input your <s-badge>Shopify Functions ID (uid)</s-badge> in <s-badge>extensions/my-function-payment-ext/shopify.extension.toml</s-badge> or <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</s-link>
-                  <s-text-field label="" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: db1fde78-bf9a-42ea-afb6-89f0edbb4797"></s-text-field>
+                  <s-text-field label="Shopify Function ID" labelAccessibilityVisibility="exclusive" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: db1fde78-bf9a-42ea-afb6-89f0edbb4797"></s-text-field>
                 </s-list-item>
                 <s-list-item>
                   <s-button variant="primary" onClick={() => {
