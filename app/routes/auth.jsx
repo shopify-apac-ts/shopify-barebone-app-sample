@@ -1,10 +1,7 @@
 import {
   embeddedHtmlData,
-  htmlSecurityHeaders,
-  oauthBounceUrl,
   redirect,
   routeHeaders,
-  topLevelRedirect,
   verifyEmbeddedRequest,
 } from '../lib/http.server.js';
 import {
@@ -33,11 +30,6 @@ export async function loader({ request }) {
     const publicOrigin = getPublicOrigin(request);
     const authorizeUrl = createOAuthAuthorizeUrl(shop, publicOrigin);
     console.info('[auth] oauth required', JSON.stringify({ shop, authorizeUrl }));
-    if (isEmbedded(params)) {
-      const bounceUrl = `${publicOrigin}${oauthBounceUrl(request)}`;
-      console.info('[auth] escaping iframe before oauth', JSON.stringify({ shop, bounceUrl }));
-      return topLevelRedirect(bounceUrl, htmlSecurityHeaders(shop, true));
-    }
     return redirect(authorizeUrl);
   }
 

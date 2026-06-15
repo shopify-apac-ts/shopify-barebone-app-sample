@@ -1,10 +1,7 @@
 import {
   embeddedHtmlData,
-  htmlSecurityHeaders,
   json,
-  oauthBounceUrl,
   redirect,
-  topLevelRedirect,
   verifyEmbeddedRequest,
 } from './http.server.js';
 import { createOAuthAuthorizeUrl, hasValidInstallation } from './oauth.server.js';
@@ -30,9 +27,6 @@ export async function embeddedPageLoader({ request, allowAuthenticatedFetch = fa
   const { shop } = verified;
   if (!(await hasValidInstallation(shop))) {
     const publicOrigin = getPublicOrigin(request);
-    if (verified.params.get('embedded') === '1') {
-      return topLevelRedirect(`${publicOrigin}${oauthBounceUrl(request)}`, htmlSecurityHeaders(shop, true));
-    }
     return redirect(createOAuthAuthorizeUrl(shop, publicOrigin));
   }
   return embeddedHtmlData(shop);
