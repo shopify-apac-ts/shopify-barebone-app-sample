@@ -6,6 +6,7 @@ import {
   verifyEmbeddedRequest,
 } from './http.server.js';
 import { createOAuthAuthorizeUrl, hasValidInstallation } from './oauth.server.js';
+import { getPublicOrigin } from './public-url.server.js';
 import { requireAuthenticatedShop } from './session-token.server.js';
 
 export async function embeddedPageLoader({ request, allowAuthenticatedFetch = false, handler = null }) {
@@ -25,9 +26,8 @@ export async function embeddedPageLoader({ request, allowAuthenticatedFetch = fa
   if (!verified.ok) return verified.response;
 
   const { shop } = verified;
-  const url = new URL(request.url);
   if (!(await hasValidInstallation(shop))) {
-    return topLevelRedirect(createOAuthAuthorizeUrl(shop, url.origin), htmlSecurityHeaders(shop, true));
+    return topLevelRedirect(createOAuthAuthorizeUrl(shop, getPublicOrigin(request)), htmlSecurityHeaders(shop, true));
   }
   return embeddedHtmlData(shop);
 }

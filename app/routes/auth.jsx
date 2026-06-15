@@ -11,6 +11,7 @@ import {
   isEmbedded,
 } from '../lib/shopify-auth.server.js';
 import { createOAuthAuthorizeUrl, hasValidInstallation } from '../lib/oauth.server.js';
+import { getPublicOrigin } from '../lib/public-url.server.js';
 import Index from '../pages/Index.jsx';
 
 export async function loader({ request }) {
@@ -28,8 +29,7 @@ export async function loader({ request }) {
   }));
 
   if (!validInstallation) {
-    const url = new URL(request.url);
-    const authorizeUrl = createOAuthAuthorizeUrl(shop, url.origin);
+    const authorizeUrl = createOAuthAuthorizeUrl(shop, getPublicOrigin(request));
     console.info('[auth] oauth required', JSON.stringify({ shop, authorizeUrl }));
     return topLevelRedirect(authorizeUrl, htmlSecurityHeaders(shop, true));
   }

@@ -3,6 +3,7 @@ import { authenticatedEndpoint } from './embedded.server.js';
 import { embeddedHtmlData, json } from './http.server.js';
 import { verifyShopifyHmac } from './shopify-auth.server.js';
 import { callAdminGraphql } from './shopify-graphql.server.js';
+import { getPublicOrigin } from './public-url.server.js';
 
 export async function loadOrderManage(request) {
   const url = new URL(request.url);
@@ -137,7 +138,7 @@ export async function loadOrderManage(request) {
     }
 
     if (url.searchParams.get('fs') === 'true') {
-      const origin = new URL(request.url).origin;
+      const origin = getPublicOrigin(request);
       response = await callAdminGraphql(context.shop, `query BareboneFulfillmentServiceOwner {
         shop {
           id

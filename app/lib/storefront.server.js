@@ -4,6 +4,7 @@ import { API_VERSION, CUSTOMER_ACCOUNT_CLIENT_ID } from './env.server.js';
 import { callAdminGraphql, callStorefrontGraphql } from './shopify-graphql.server.js';
 import { getCustomerAccountSession } from './customer-account.server.js';
 import { htmlSecurityHeaders } from './http.server.js';
+import { getPublicOrigin } from './public-url.server.js';
 
 const STOREFRONT_TOKEN_CREATE = `mutation StorefrontAccessTokenCreate($input: StorefrontAccessTokenInput!) {
   storefrontAccessTokenCreate(input: $input) {
@@ -361,7 +362,7 @@ export async function renderStorefrontPage(request, { shop, publicToken }) {
     public_token: publicToken,
     api_version: API_VERSION,
     customer_account_client_id: CUSTOMER_ACCOUNT_CLIENT_ID,
-    customer_account_callback_url: `${new URL(request.url).origin}/customer-account/callback`,
+    customer_account_callback_url: `${getPublicOrigin(request)}/customer-account/callback`,
     customer_account_profile: JSON.stringify(customerSession != null ? customerSession.profile : null),
   };
 

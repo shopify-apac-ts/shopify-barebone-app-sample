@@ -11,6 +11,7 @@ import {
   prepareStorefrontAccess,
   renderStorefrontPage,
 } from '../lib/storefront.server.js';
+import { getPublicOrigin } from '../lib/public-url.server.js';
 import Storefront from '../pages/Storefront.jsx';
 
 export async function loader({ request }) {
@@ -19,7 +20,7 @@ export async function loader({ request }) {
   const authContext = await requireAuthenticatedShop(request);
   if (authContext.ok) {
     try {
-      const response = await prepareStorefrontAccess(authContext.shop, url.origin);
+      const response = await prepareStorefrontAccess(authContext.shop, getPublicOrigin(request));
       return json({
         result: {
           message: '',

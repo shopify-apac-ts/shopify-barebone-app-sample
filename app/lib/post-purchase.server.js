@@ -4,9 +4,10 @@ import { json } from './http.server.js';
 import { requireAuthenticatedShop } from './session-token.server.js';
 import { createAppJwt, decodeSessionToken } from './shopify-auth.server.js';
 import { callAdminGraphql } from './shopify-graphql.server.js';
+import { getPublicOrigin } from './public-url.server.js';
 
 export async function preparePostPurchase(request, context) {
-  const origin = new URL(request.url).origin;
+  const origin = getPublicOrigin(request);
   const errors = {
     errors: 0,
     apis: [],
