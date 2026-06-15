@@ -13,7 +13,7 @@ For quick start with automatically generated code, go to the [official CLI tutor
 app/ ... React Router route modules, UI pages written directly with Polaris and App Bridge web components, and server helpers for OAuth, session token validation, Storefront API, Customer Account API, GraphQL calls, and DB access. No Express wrapper and no Shopify CLI generated app template are used.
 
   ./root.jsx ... React Router HTML shell that loads App Bridge and Polaris web components from Shopify CDN.
-  ./AppShell.jsx ... Embedded app shell using App Bridge web components for the title bar and app navigation. The app navigation uses `<s-app-nav>` with plain anchor children so Shopify Admin can register the sidebar menu while page content continues to use Polaris `<s-*>` web components directly.
+  ./AppShell.jsx ... Embedded app shell using App Bridge web components for the title bar and app navigation. This is the React Router layout route's default export, so the App Bridge navigation is present in both SSR HTML and the client route bundle. The app navigation uses `<s-app-nav>` with plain anchor children so Shopify Admin can register the sidebar menu while page content continues to use Polaris `<s-*>` web components directly.
   ./routes/ ... HTTP entry points. Each route is intentionally thin and points to one Shopify sample concept. Embedded HTML routes export headers from `app/lib/http.server.js` so Shopify iframe protection is applied.
   ./pages/ ... Embedded app UI pages rendered by React Router with Polaris web components used directly in each page.
   ./lib/ ... Server-side Shopify API helpers, grouped by learning topic.
