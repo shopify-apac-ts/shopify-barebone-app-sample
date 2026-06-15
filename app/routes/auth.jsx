@@ -30,10 +30,11 @@ export async function loader({ request }) {
   }));
 
   if (!validInstallation) {
-    const authorizeUrl = createOAuthAuthorizeUrl(shop, getPublicOrigin(request));
+    const publicOrigin = getPublicOrigin(request);
+    const authorizeUrl = createOAuthAuthorizeUrl(shop, publicOrigin);
     console.info('[auth] oauth required', JSON.stringify({ shop, authorizeUrl }));
     if (isEmbedded(params)) {
-      const bounceUrl = oauthBounceUrl(request);
+      const bounceUrl = `${publicOrigin}${oauthBounceUrl(request)}`;
       console.info('[auth] escaping iframe before oauth', JSON.stringify({ shop, bounceUrl }));
       return topLevelRedirect(bounceUrl, htmlSecurityHeaders(shop, true));
     }

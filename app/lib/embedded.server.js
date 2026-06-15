@@ -29,10 +29,11 @@ export async function embeddedPageLoader({ request, allowAuthenticatedFetch = fa
 
   const { shop } = verified;
   if (!(await hasValidInstallation(shop))) {
+    const publicOrigin = getPublicOrigin(request);
     if (verified.params.get('embedded') === '1') {
-      return topLevelRedirect(oauthBounceUrl(request), htmlSecurityHeaders(shop, true));
+      return topLevelRedirect(`${publicOrigin}${oauthBounceUrl(request)}`, htmlSecurityHeaders(shop, true));
     }
-    return redirect(createOAuthAuthorizeUrl(shop, getPublicOrigin(request)));
+    return redirect(createOAuthAuthorizeUrl(shop, publicOrigin));
   }
   return embeddedHtmlData(shop);
 }

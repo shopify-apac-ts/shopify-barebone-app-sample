@@ -60,21 +60,26 @@ export function topLevelRedirect(location, headers = {}) {
     <script>
       const target = ${safeLocation};
       function fallbackRedirect() {
-        window.open(target, "_top");
+        try {
+          window.top.location.href = target;
+        } catch (_error) {}
+        try {
+          window.open(target, "_top");
+        } catch (_error) {}
+        document.getElementById("continue").click();
       }
       function redirectTop() {
         if (window.shopify && typeof window.shopify.open === "function") {
-          Promise.resolve(window.shopify.open(target, "_top")).catch(fallbackRedirect);
-          return;
+          Promise.resolve(window.shopify.open(target, "_top")).catch(function () {});
         }
-        fallbackRedirect();
+        setTimeout(fallbackRedirect, 500);
       }
       window.addEventListener("load", redirectTop);
       setTimeout(redirectTop, 300);
     </script>
   </head>
   <body>
-    <a href=${safeLocation} target="_top">Continue</a>
+    <a id="continue" href=${safeLocation} target="_top">Continue</a>
   </body>
 </html>`,
     {
