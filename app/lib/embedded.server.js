@@ -1,4 +1,4 @@
-import { json } from './http.server.js';
+import { embeddedHtmlData, json } from './http.server.js';
 import { requireAuthenticatedShop } from './session-token.server.js';
 import { verifyShopifyHmac } from './shopify-auth.server.js';
 
@@ -21,7 +21,7 @@ export async function embeddedPageLoader({ request, allowAuthenticatedFetch = fa
   }
   const shop = url.searchParams.get('shop');
   if (!shop) return new Response('Missing shop', { status: 400 });
-  return null;
+  return embeddedHtmlData(shop);
 }
 
 export async function authenticatedEndpoint(request, handler) {

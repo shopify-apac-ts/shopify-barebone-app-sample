@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { API_VERSION, CUSTOMER_ACCOUNT_CLIENT_ID } from './env.server.js';
 import { callAdminGraphql, callStorefrontGraphql } from './shopify-graphql.server.js';
 import { getCustomerAccountSession } from './customer-account.server.js';
+import { htmlSecurityHeaders } from './http.server.js';
 
 const STOREFRONT_TOKEN_CREATE = `mutation StorefrontAccessTokenCreate($input: StorefrontAccessTokenInput!) {
   storefrontAccessTokenCreate(input: $input) {
@@ -368,6 +369,7 @@ export async function renderStorefrontPage(request, { shop, publicToken }) {
   return new Response(html, {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
+      ...htmlSecurityHeaders(shop, false),
     },
   });
 }

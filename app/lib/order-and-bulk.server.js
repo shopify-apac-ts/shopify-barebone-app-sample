@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { authenticatedEndpoint } from './embedded.server.js';
-import { json } from './http.server.js';
+import { embeddedHtmlData, json } from './http.server.js';
 import { verifyShopifyHmac } from './shopify-auth.server.js';
 import { callAdminGraphql } from './shopify-graphql.server.js';
 
@@ -8,7 +8,9 @@ export async function loadOrderManage(request) {
   const url = new URL(request.url);
   if (url.searchParams.get('embedded') === '1') {
     if (!verifyShopifyHmac(url.searchParams)) return new Response('HMAC verification failed', { status: 400 });
-    return null;
+    const shop = url.searchParams.get('shop');
+    if (!shop) return new Response('Missing shop', { status: 400 });
+    return embeddedHtmlData(shop);
   }
 
   return authenticatedEndpoint(request, async (context) => {
@@ -383,4 +385,3 @@ export async function loadBulkOperation(request) {
     return json(response);
   });
 }
-

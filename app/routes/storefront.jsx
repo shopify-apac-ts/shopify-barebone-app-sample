@@ -1,4 +1,10 @@
-import { json, parseRequestBody, verifyEmbeddedRequest } from '../lib/http.server.js';
+import {
+  embeddedHtmlData,
+  json,
+  parseRequestBody,
+  routeHeaders,
+  verifyEmbeddedRequest,
+} from '../lib/http.server.js';
 import { requireAuthenticatedShop } from '../lib/session-token.server.js';
 import {
   callPrivateStorefrontAction,
@@ -41,7 +47,7 @@ export async function loader({ request }) {
 
   const verified = verifyEmbeddedRequest(request);
   if (!verified.ok) return verified.response;
-  return null;
+  return embeddedHtmlData(verified.shop);
 }
 
 export async function action({ request }) {
@@ -59,5 +65,7 @@ export async function action({ request }) {
 
   return json(result);
 }
+
+export const headers = routeHeaders;
 
 export default Storefront;

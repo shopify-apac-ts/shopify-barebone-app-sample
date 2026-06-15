@@ -1,5 +1,12 @@
 import { API_KEY } from '../lib/env.server.js';
-import { redirect, topLevelRedirect, verifyEmbeddedRequest } from '../lib/http.server.js';
+import {
+  embeddedHtmlData,
+  htmlSecurityHeaders,
+  redirect,
+  routeHeaders,
+  topLevelRedirect,
+  verifyEmbeddedRequest,
+} from '../lib/http.server.js';
 import {
   createAppJwt,
   isEmbedded,
@@ -20,14 +27,16 @@ export async function loader({ request }) {
     redirectUrl.searchParams.set('redirect_uri', callbackUrl);
     redirectUrl.searchParams.set('state', '');
     redirectUrl.searchParams.append('grant_options[]', '');
-    return topLevelRedirect(redirectUrl.toString());
+    return topLevelRedirect(redirectUrl.toString(), htmlSecurityHeaders(shop, true));
   }
 
   if (!isEmbedded(params)) {
     return redirect(`/mocklogin?my_token=${createAppJwt({ shop })}`);
   }
 
-  return null;
+  return embeddedHtmlData(shop);
 }
+
+export const headers = routeHeaders;
 
 export default Index;

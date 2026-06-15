@@ -1,5 +1,10 @@
+import { data } from 'react-router';
 import { CONTENT_TYPE_JSON } from './env.server.js';
-import { verifyShopifyHmac } from './shopify-auth.server.js';
+import { contentSecurityPolicy, verifyShopifyHmac } from './shopify-auth.server.js';
+
+function hasHeaders(headers) {
+  return [...headers].length > 0;
+}
 
 export function json(data, init = {}) {
   return new Response(JSON.stringify(data), {
@@ -20,7 +25,23 @@ export function redirect(location, status = 302) {
   });
 }
 
-export function topLevelRedirect(location) {
+export function htmlSecurityHeaders(shop, embedded) {
+  return {
+    'Content-Security-Policy': contentSecurityPolicy(shop, embedded),
+  };
+}
+
+export function embeddedHtmlData(shop) {
+  return data(null, {
+    headers: htmlSecurityHeaders(shop, true),
+  });
+}
+
+export function routeHeaders({ actionHeaders, loaderHeaders }) {
+  return hasHeaders(actionHeaders) ? actionHeaders : loaderHeaders;
+}
+
+export function topLevelRedirect(location, headers = {}) {
   const safeLocation = JSON.stringify(location);
   return new Response(
     `<!doctype html>
@@ -36,6 +57,7 @@ export function topLevelRedirect(location) {
     {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
+        ...headers,
       },
     }
   );
