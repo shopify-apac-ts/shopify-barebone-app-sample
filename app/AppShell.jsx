@@ -19,13 +19,13 @@ export function AppShell() {
   return (
     <>
       <ui-title-bar title="Welcome to my barebone app"></ui-title-bar>
-      <s-app-nav>
+      <ui-nav-menu>
         {links.map(([label, href]) => (
-          <s-link key={href} href={href}>
+          <a key={href} href={href}>
             {label}
-          </s-link>
+          </a>
         ))}
-      </s-app-nav>
+      </ui-nav-menu>
       <Outlet />
     </>
   );
