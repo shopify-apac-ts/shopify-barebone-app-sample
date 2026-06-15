@@ -43,7 +43,7 @@ export async function verifyWebhookHmac(request) {
 }
 
 export function getIdFromShop(shop) {
-  return shop.replace('.myshopify.com', '');
+  return normalizeShopDomain(shop).replace('.myshopify.com', '');
 }
 
 export function getAdminFromShop(shop) {
@@ -52,7 +52,7 @@ export function getAdminFromShop(shop) {
 
 export function getShopFromSessionToken(token) {
   const payload = jwtDecode(token);
-  return payload.dest.replace('https://', '');
+  return normalizeShopDomain(payload.dest);
 }
 
 export function decodeSessionToken(token) {
@@ -92,6 +92,17 @@ export function contentSecurityPolicy(shop, embedded) {
 
 export function isEmbedded(params) {
   return params.get('embedded') === '1';
+}
+
+export function normalizeShopDomain(value) {
+  if (!value) return '';
+  const host = String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .split(/[/?#]/)[0];
+  if (!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(host)) return '';
+  return host;
 }
 
 function encodeShopifyParam(value) {

@@ -1,6 +1,6 @@
 import { data } from 'react-router';
 import { CONTENT_TYPE_JSON } from './env.server.js';
-import { contentSecurityPolicy, verifyShopifyHmac } from './shopify-auth.server.js';
+import { contentSecurityPolicy, normalizeShopDomain, verifyShopifyHmac } from './shopify-auth.server.js';
 
 function hasHeaders(headers) {
   return [...headers].length > 0;
@@ -68,9 +68,9 @@ export function verifyEmbeddedRequest(request) {
   if (!verifyShopifyHmac(params)) {
     return { ok: false, params, response: new Response('HMAC verification failed', { status: 400 }) };
   }
-  const shop = params.get('shop');
+  const shop = normalizeShopDomain(params.get('shop'));
   if (!shop) {
-    return { ok: false, params, response: new Response('Missing shop', { status: 400 }) };
+    return { ok: false, params, response: new Response('Missing or invalid shop', { status: 400 }) };
   }
   return { ok: true, params, shop };
 }

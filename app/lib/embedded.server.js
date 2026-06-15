@@ -1,6 +1,12 @@
-import { embeddedHtmlData, json } from './http.server.js';
+import {
+  embeddedHtmlData,
+  htmlSecurityHeaders,
+  json,
+  topLevelRedirect,
+  verifyEmbeddedRequest,
+} from './http.server.js';
+import { createOAuthAuthorizeUrl, hasValidInstallation } from './oauth.server.js';
 import { requireAuthenticatedShop } from './session-token.server.js';
-import { verifyShopifyHmac } from './shopify-auth.server.js';
 
 export async function embeddedPageLoader({ request, allowAuthenticatedFetch = false, handler = null }) {
   if (allowAuthenticatedFetch && request.headers.has('authorization')) {
@@ -15,12 +21,14 @@ export async function embeddedPageLoader({ request, allowAuthenticatedFetch = fa
     });
   }
 
+  const verified = verifyEmbeddedRequest(request);
+  if (!verified.ok) return verified.response;
+
+  const { shop } = verified;
   const url = new URL(request.url);
-  if (!verifyShopifyHmac(url.searchParams)) {
-    return new Response('HMAC verification failed', { status: 400 });
+  if (!(await hasValidInstallation(shop))) {
+    return topLevelRedirect(createOAuthAuthorizeUrl(shop, url.origin), htmlSecurityHeaders(shop, true));
   }
-  const shop = url.searchParams.get('shop');
-  if (!shop) return new Response('Missing shop', { status: 400 });
   return embeddedHtmlData(shop);
 }
 

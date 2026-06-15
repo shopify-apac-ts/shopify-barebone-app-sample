@@ -4,6 +4,7 @@ import {
   getShopFromSessionToken,
   verifySessionToken,
 } from './shopify-auth.server.js';
+import { isCurrentAppInstallation } from './oauth.server.js';
 import { getShopData } from './shop-store.server.js';
 
 export function getAuthenticatedFetchContext(request) {
@@ -24,11 +25,26 @@ export function getAuthenticatedFetchContext(request) {
     };
   }
 
+  const shop = getShopFromSessionToken(token);
+  if (!shop) {
+    return {
+      ok: false,
+      token,
+      signature,
+      response: {
+        result: {
+          message: 'Authorization failed. Invalid shop in session token',
+        },
+      },
+      status: 400,
+    };
+  }
+
   return {
     ok: true,
     token,
     signature,
-    shop: getShopFromSessionToken(token),
+    shop,
     payload: decodeSessionToken(token),
   };
 }
@@ -47,6 +63,18 @@ export async function requireAuthenticatedShop(request) {
       response: {
         result: {
           message: 'Authorization failed. No shop data',
+        },
+      },
+    };
+  }
+
+  if (!isCurrentAppInstallation(shopData)) {
+    return {
+      ok: false,
+      status: 401,
+      response: {
+        result: {
+          message: 'Authorization failed. Stored OAuth data is missing or belongs to a different app client. Reload the embedded app to restart OAuth.',
         },
       },
     };

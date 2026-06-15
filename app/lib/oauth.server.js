@@ -1,10 +1,13 @@
 import {
+  ACCESS_SCOPES,
   API_KEY,
+  API_VERSION,
   API_SECRET,
   CONTENT_TYPE_JSON,
 } from './env.server.js';
 import { callAdminGraphql } from './shopify-graphql.server.js';
 import { getShopData } from './shop-store.server.js';
+import { normalizeShopDomain } from './shopify-auth.server.js';
 
 const APP_HANDLE_QUERY = `query AppHandle {
   app {
@@ -23,10 +26,12 @@ const SHOP_QUERY = `query InstalledShop {
 
 export async function hasValidInstallation(shop) {
   if (!API_KEY || !API_SECRET) return false;
-  const shopData = await getShopData(shop);
-  if (shopData == null) return false;
+  const shopDomain = normalizeShopDomain(shop);
+  if (!shopDomain) return false;
+  const shopData = await getShopData(shopDomain);
+  if (!isCurrentAppInstallation(shopData)) return false;
   try {
-    const response = await callAdminGraphql(shop, SHOP_QUERY);
+    const response = await callAdminGraphql(shopDomain, SHOP_QUERY);
     return response.data?.shop?.name != null && response.data?.app?.handle != null;
   } catch (_error) {
     return false;
@@ -34,7 +39,9 @@ export async function hasValidInstallation(shop) {
 }
 
 export async function exchangeOAuthCode(shop, code) {
-  const response = await fetch(`https://${shop}/admin/oauth/access_token`, {
+  const shopDomain = normalizeShopDomain(shop);
+  if (!shopDomain) throw new Response('Invalid shop', { status: 400 });
+  const response = await fetch(`https://${shopDomain}/admin/oauth/access_token`, {
     method: 'POST',
     headers: {
       'Content-Type': CONTENT_TYPE_JSON,
@@ -54,4 +61,29 @@ export async function exchangeOAuthCode(shop, code) {
 export async function getAppHandle(shop, accessToken) {
   const response = await callAdminGraphql(shop, APP_HANDLE_QUERY, null, accessToken);
   return response.data?.app?.handle;
+}
+
+export function createOAuthAuthorizeUrl(shop, origin) {
+  const shopDomain = normalizeShopDomain(shop);
+  const redirectUrl = new URL(`https://${shopDomain}/admin/oauth/authorize`);
+  redirectUrl.searchParams.set('client_id', API_KEY);
+  redirectUrl.searchParams.set('scope', ACCESS_SCOPES);
+  redirectUrl.searchParams.set('redirect_uri', `${origin}/callback`);
+  redirectUrl.searchParams.set('state', '');
+  return redirectUrl.toString();
+}
+
+export function buildStoredShopData(shop, tokenResponse) {
+  return {
+    ...tokenResponse,
+    shop: normalizeShopDomain(shop),
+    client_id: API_KEY,
+    api_version: API_VERSION,
+    scopes: ACCESS_SCOPES,
+    stored_at: new Date().toISOString(),
+  };
+}
+
+export function isCurrentAppInstallation(shopData) {
+  return Boolean(shopData?.access_token && shopData.client_id === API_KEY);
 }

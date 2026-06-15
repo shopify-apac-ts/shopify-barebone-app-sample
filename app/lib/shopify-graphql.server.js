@@ -5,13 +5,16 @@ import {
   USER_AGENT,
 } from './env.server.js';
 import { getShopData } from './shop-store.server.js';
+import { normalizeShopDomain } from './shopify-auth.server.js';
 
 export async function callAdminGraphql(shop, query, variables = null, token = null) {
-  const accessToken = token || (await getShopData(shop))?.access_token;
-  if (!accessToken) throw new Error(`No Admin API token stored for ${shop}`);
-  return callShopifyGraphql(`https://${shop}/${GRAPHQL_PATH_ADMIN}`, query, variables, {
+  const shopDomain = normalizeShopDomain(shop);
+  if (!shopDomain) throw new Error(`Invalid Shopify shop domain: ${shop || '(empty)'}`);
+  const accessToken = token || (await getShopData(shopDomain))?.access_token;
+  if (!accessToken) throw new Error(`No Admin API token stored for ${shopDomain}`);
+  return callShopifyGraphql(`https://${shopDomain}/${GRAPHQL_PATH_ADMIN}`, query, variables, {
     'X-Shopify-Access-Token': accessToken,
-  });
+  }, { apiName: 'Shopify Admin GraphQL', shop: shopDomain });
 }
 
 export async function callStorefrontGraphql(shop, query, variables, token, buyerIp = null) {
@@ -25,7 +28,7 @@ export async function callStorefrontGraphql(shop, query, variables, token, buyer
   return callShopifyGraphql(`https://${shop}/${GRAPHQL_PATH_STOREFRONT}`, query, variables, headers);
 }
 
-async function callShopifyGraphql(endpoint, query, variables, headers) {
+async function callShopifyGraphql(endpoint, query, variables, headers, context = {}) {
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -40,7 +43,12 @@ async function callShopifyGraphql(endpoint, query, variables, headers) {
   });
   const json = await response.json();
   if (!response.ok) {
-    const error = new Error(`Shopify GraphQL failed ${response.status}: ${JSON.stringify(json)}`);
+    const prefix = context.apiName || 'Shopify GraphQL';
+    const shopHint = context.shop ? ` for ${context.shop}` : '';
+    const staleTokenHint = response.status === 401
+      ? ' The access token was rejected by Shopify; refresh OAuth for this shop and app.'
+      : '';
+    const error = new Error(`${prefix} failed ${response.status}${shopHint}:${staleTokenHint} ${JSON.stringify(json)}`);
     error.status = response.status;
     error.body = json;
     throw error;

@@ -1,4 +1,3 @@
-import { API_KEY } from '../lib/env.server.js';
 import {
   embeddedHtmlData,
   htmlSecurityHeaders,
@@ -11,7 +10,7 @@ import {
   createAppJwt,
   isEmbedded,
 } from '../lib/shopify-auth.server.js';
-import { hasValidInstallation } from '../lib/oauth.server.js';
+import { createOAuthAuthorizeUrl, hasValidInstallation } from '../lib/oauth.server.js';
 import Index from '../pages/Index.jsx';
 
 export async function loader({ request }) {
@@ -21,13 +20,7 @@ export async function loader({ request }) {
   const { params, shop } = verified;
   if (!(await hasValidInstallation(shop))) {
     const url = new URL(request.url);
-    const callbackUrl = `${url.origin}/callback`;
-    const redirectUrl = new URL(`https://${shop}/admin/oauth/authorize`);
-    redirectUrl.searchParams.set('client_id', API_KEY);
-    redirectUrl.searchParams.set('redirect_uri', callbackUrl);
-    redirectUrl.searchParams.set('state', '');
-    redirectUrl.searchParams.append('grant_options[]', '');
-    return topLevelRedirect(redirectUrl.toString(), htmlSecurityHeaders(shop, true));
+    return topLevelRedirect(createOAuthAuthorizeUrl(shop, url.origin), htmlSecurityHeaders(shop, true));
   }
 
   if (!isEmbedded(params)) {

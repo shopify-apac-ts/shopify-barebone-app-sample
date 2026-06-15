@@ -14,47 +14,55 @@ import {
   POSTGRESQL_TABLE,
   POSTGRESQL_URL,
 } from './env.server.js';
+import { normalizeShopDomain } from './shopify-auth.server.js';
 
 export async function getShopData(shop) {
+  const key = shopKey(shop);
   switch (DB_TYPE) {
     case 'POSTGRESQL':
-      return getPostgreSQL(shop);
+      return getPostgreSQL(key);
     case 'MYSQL':
-      return getMySQL(shop);
+      return getMySQL(key);
     default:
-      return getMongo(shop);
+      return getMongo(key);
   }
 }
 
 export async function upsertShopData(shop, data) {
-  const existing = await getShopData(shop);
-  if (existing == null) return insertShopData(shop, data);
-  return setShopData(shop, data);
+  const key = shopKey(shop);
+  const existing = await getShopData(key);
+  if (existing == null) return insertShopData(key, data);
+  return setShopData(key, data);
 }
 
 export async function insertShopData(shop, data) {
+  const key = shopKey(shop);
   switch (DB_TYPE) {
     case 'POSTGRESQL':
-      return insertPostgreSQL(shop, data);
+      return insertPostgreSQL(key, data);
     case 'MYSQL':
-      return insertMySQL(shop, data);
+      return insertMySQL(key, data);
     default:
-      return insertMongo(shop, data);
+      return insertMongo(key, data);
   }
 }
 
 export async function setShopData(shop, data) {
+  const key = shopKey(shop);
   switch (DB_TYPE) {
     case 'POSTGRESQL':
-      return setPostgreSQL(shop, data);
+      return setPostgreSQL(key, data);
     case 'MYSQL':
-      return setMySQL(shop, data);
+      return setMySQL(key, data);
     default:
-      return setMongo(shop, data);
+      return setMongo(key, data);
   }
 }
 
 async function withMongo(callback) {
+  if (!MONGO_URL || !MONGO_DB_NAME) {
+    throw new Error('MongoDB is selected but SHOPIFY_MONGO_URL or SHOPIFY_MONGO_DB_NAME is missing');
+  }
   const client = await mongo.MongoClient.connect(MONGO_URL);
   try {
     return await callback(client.db(MONGO_DB_NAME).collection(MONGO_COLLECTION));
@@ -166,4 +174,10 @@ async function setMySQL(key, data) {
 
 function mysqlDate(date) {
   return date.toISOString().replace('T', ' ').replace('Z', '');
+}
+
+function shopKey(shop) {
+  const key = normalizeShopDomain(shop);
+  if (!key) throw new Error(`Invalid Shopify shop domain: ${shop || '(empty)'}`);
+  return key;
 }
