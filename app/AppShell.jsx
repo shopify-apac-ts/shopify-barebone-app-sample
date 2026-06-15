@@ -15,7 +15,7 @@ const links = [
   ["Storefront API", "/storefront"],
 ];
 
-export function AppShell() {
+export default function AppShell() {
   return (
     <>
       <ui-title-bar title="Welcome to my barebone app"></ui-title-bar>
