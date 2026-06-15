@@ -63,6 +63,7 @@ If you are new to this sample, start from these files instead of reading the rep
     SHOPIFY_API_SECRET:           YOUR_API_SECRET (Copy and paste from your app settings in partner dashboard)
     SHOPIFY_API_VERSION:          2026-04
     SHOPIFY_SCOPES:               Optional. Comma-separated Admin API scopes. If omitted, the sample uses the same default scopes as the included shopify.app.toml file.
+    SHOPIFY_APP_URL:              YOUR_APP_URL. Recommended on hosted environments like Render so OAuth and Customer Account API callback URLs use the public HTTPS origin.
 
     // Required for the Storefront API sample's Customer Account API login flow.
     SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID: YOUR_CUSTOMER_ACCOUNT_API_CLIENT_ID
