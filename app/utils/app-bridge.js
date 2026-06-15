@@ -45,6 +45,14 @@ function openBrowserTab(url) {
 
 async function openWithTarget(url, target) {
   const shopify = useAppBridge();
+  if (target === "_top") {
+    if (shopify?.open) {
+      await shopify.open(url, "_top");
+      return;
+    }
+    window.open(url, "_top");
+    return;
+  }
   if (target === "_blank") {
     if (openBrowserTab(url) !== false) return;
     if (shopify?.open) {
@@ -74,15 +82,31 @@ export async function openRemote(url, newContext = false) {
 }
 
 export function navigateApp(path) {
-  window.location.assign(path);
+  const target = new URL(path, window.location.origin);
+  const params = new URLSearchParams(window.location.search);
+  for (const key of ["embedded", "hmac", "host", "locale", "shop", "timestamp"]) {
+    if (params.has(key) && !target.searchParams.has(key)) {
+      target.searchParams.set(key, params.get(key));
+    }
+  }
+  window.location.assign(`${target.pathname}${target.search}`);
 }
 
-export function navigateAdmin(path) {
+function toAdminProtocol(path) {
+  if (!path.startsWith("/")) return path;
+  return `shopify://admin${path}`;
+}
+
+export function navigateAdmin(path, newContext = false) {
   const shop = getShopFromLocation();
   const target = shop && path.startsWith("/")
     ? `https://${getAdminFromShop(shop)}${path}`
     : path;
-  return openEmbedded(target);
+  const adminTarget = toAdminProtocol(path);
+  if (!newContext && adminTarget.startsWith("shopify://admin")) {
+    return openWithTarget(adminTarget, "_top");
+  }
+  return openWithTarget(target, newContext ? "_blank" : "_top");
 }
 
 export function decodeSessionToken(sessionToken) {
@@ -112,7 +136,7 @@ export function createRedirect() {
       }
       if (action === RedirectAction.ADMIN_PATH) {
         const path = typeof payload === "string" ? payload : payload.path;
-        navigateAdmin(path);
+        navigateAdmin(path, Boolean(payload?.newContext));
       }
     },
   };

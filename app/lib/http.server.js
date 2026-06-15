@@ -20,6 +20,27 @@ export function redirect(location, status = 302) {
   });
 }
 
+export function topLevelRedirect(location) {
+  const safeLocation = JSON.stringify(location);
+  return new Response(
+    `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script>window.open(${safeLocation}, "_top");</script>
+  </head>
+  <body>
+    <a href=${safeLocation} target="_top">Continue</a>
+  </body>
+</html>`,
+    {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+      },
+    }
+  );
+}
+
 export function verifyEmbeddedRequest(request) {
   const params = new URL(request.url).searchParams;
   if (!verifyShopifyHmac(params)) {

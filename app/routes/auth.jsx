@@ -1,5 +1,5 @@
 import { API_KEY } from '../lib/env.server.js';
-import { redirect, verifyEmbeddedRequest } from '../lib/http.server.js';
+import { redirect, topLevelRedirect, verifyEmbeddedRequest } from '../lib/http.server.js';
 import {
   createAppJwt,
   isEmbedded,
@@ -20,7 +20,7 @@ export async function loader({ request }) {
     redirectUrl.searchParams.set('redirect_uri', callbackUrl);
     redirectUrl.searchParams.set('state', '');
     redirectUrl.searchParams.append('grant_options[]', '');
-    return redirect(redirectUrl.toString());
+    return topLevelRedirect(redirectUrl.toString());
   }
 
   if (!isEmbedded(params)) {
