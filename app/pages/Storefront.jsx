@@ -1,30 +1,20 @@
-import { useState } from 'react';
-import { authenticatedJson, createRedirect, RedirectAction } from "../utils/app-bridge";
+import { useEffect, useState } from 'react';
+import { authenticatedJson } from "../utils/app-bridge";
 import { getShopFromLocation } from "../utils/shop";
 
 
 // Storefront API sample
 // Read https://shopify.dev/docs/api/storefront
 function Storefront() {
-  const redirect = createRedirect();
-
-  const shop = getShopFromLocation();
-
+  const [shop, setShop] = useState('');
   const [result, setResult] = useState({});
   const [accessing, setAccessing] = useState(false);
 
-  const openStorefrontPage = () => {
-    const targetShop = shop || result.shop;
-    if (!targetShop) return;
-    const storefrontUrl = new URL('/storefront', window.location.origin);
-    storefrontUrl.searchParams.set('shop', targetShop);
-    const publicToken = result.public_token?.accessToken || '';
-    if (publicToken) storefrontUrl.searchParams.set('public_token', publicToken);
-    redirect.dispatch(RedirectAction.REMOTE, {
-      url: storefrontUrl.toString(),
-      newContext: true,
-    });
-  };
+  useEffect(() => {
+    setShop(getShopFromLocation());
+  }, []);
+
+  const storefrontPageUrl = buildStorefrontPageUrl(shop || result.shop, result.public_token?.accessToken);
 
   return (
     <s-page heading="Storefront API sample with Cart API, tokenless access, and Customer Account API">
@@ -67,11 +57,9 @@ function Storefront() {
                   </s-unordered-list>
                 </s-list-item>
                 <s-list-item>
-                  Open the <s-link href="#" onClick={(event) => {
-                    event.preventDefault();
-                    openStorefrontPage();
-                  }}>plain custom storefront page
-                  </s-link> using Cart API, tokenless access, and Customer Account API login.
+                  Open the {storefrontPageUrl
+                    ? <s-link href={storefrontPageUrl} target="_blank">plain custom storefront page</s-link>
+                    : <s-text>plain custom storefront page</s-text>} using Cart API, tokenless access, and Customer Account API login.
                 </s-list-item>
               </s-ordered-list>
             </s-box>
@@ -80,6 +68,14 @@ function Storefront() {
       </s-stack>
     </s-page>
   );
+}
+
+function buildStorefrontPageUrl(shop, publicToken) {
+  if (typeof window === 'undefined' || !shop) return '';
+  const storefrontUrl = new URL('/storefront', window.location.origin);
+  storefrontUrl.searchParams.set('shop', shop);
+  if (publicToken) storefrontUrl.searchParams.set('public_token', publicToken);
+  return storefrontUrl.toString();
 }
 
 function APIResult(props) {
