@@ -8,30 +8,71 @@ import { getAdminFromShop, getCurrentUrlWithoutQuery, getQueryParam, getShopFrom
 // Read https://shopify.dev/apps/app-extensions/getting-started#add-an-admin-link
 function AdminLink() {
     const redirect = createRedirect();
+    const [pageContext, setPageContext] = useState({
+        ready: false,
+        id: null,
+        rawUrl: '',
+        shop: '',
+    });
+    const [res, setRes] = useState('');
 
-    // Raw endpoint of this menu
-    const rawUrl = getCurrentUrlWithoutQuery();
+    useEffect(() => {
+        setPageContext({
+            ready: true,
+            id: getQueryParam("id"),
+            rawUrl: getCurrentUrlWithoutQuery(),
+            shop: getShopFromLocation(),
+        });
+    }, []);
 
-    const shop = getShopFromLocation();
+    const { ready, id, rawUrl, shop } = pageContext;
+
+    useEffect(() => {
+        if (!id) {
+            setRes('');
+            return undefined;
+        }
+
+        let cancelled = false;
+        setRes('');
+
+        authenticatedFetch(`/adminlink.json?id=${encodeURIComponent(id)}`).then(async (response) => {
+            const text = await response.text();
+            const contentType = response.headers.get('content-type') || 'unknown content type';
+            if (!response.ok) {
+                throw new Error(`Admin Link API failed ${response.status}: ${text.slice(0, 1000)}`);
+            }
+
+            let json;
+            try {
+                json = JSON.parse(text);
+            } catch (error) {
+                throw new Error(`Admin Link API returned ${contentType}, not JSON: ${text.slice(0, 1000)}`);
+            }
+
+            console.log(JSON.stringify(json, null, 4));
+            if (!cancelled) setRes(JSON.stringify(json.result, null, 4));
+        }).catch((error) => {
+            console.log(`${error}`);
+            if (!cancelled) setRes(`${error}`);
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [id]);
+
+    if (!ready) {
+        return (
+            <s-page heading="Admin Link">
+                <s-spinner accessibilityLabel="Loading Admin Link"></s-spinner>
+            </s-page>
+        );
+    }
 
     // This query parameter is supposed to be given by Admin Link extensions.
-    const id = getQueryParam("id");
     // Supposed to be shown from the linked page like a order details.
     if (id != null) {
-        const [res, setRes] = useState('');
-
-        useEffect(() => {
-            authenticatedFetch(`/adminlink?id=${id}`).then((response) => {
-                response.json().then((json) => {
-                    console.log(JSON.stringify(json, null, 4));
-                    setRes(JSON.stringify(json.result, null, 4));
-                }).catch((e) => {
-                    console.log(`${e}`);
-                    setRes(``);
-                });
-            });
-        }, [id]);
-
         return (
             <s-page heading="You seem to have come through Admin Link!">
                 <s-stack direction="block" gap="base">

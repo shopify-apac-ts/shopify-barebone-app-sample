@@ -49,13 +49,15 @@ async function callShopifyGraphql(endpoint, query, variables, headers, context =
       variables,
     }),
   });
-  const json = await response.json();
+  const responseText = await response.text();
+  const json = parseGraphqlResponse(responseText);
   console.info('[shopify-graphql] response', JSON.stringify({
     apiName: context.apiName || 'Shopify GraphQL',
     endpoint,
     operation: getGraphqlOperationName(query),
     status: response.status,
     ok: response.ok,
+    body: json == null ? previewText(responseText) : redactGraphqlVariables(json),
   }));
 
   if (!response.ok) {
@@ -64,12 +66,25 @@ async function callShopifyGraphql(endpoint, query, variables, headers, context =
     const staleTokenHint = response.status === 401
       ? ' The access token was rejected by Shopify; refresh OAuth for this shop and app.'
       : '';
-    const error = new Error(`${prefix} failed ${response.status}${shopHint}:${staleTokenHint} ${JSON.stringify(json)}`);
+    const error = new Error(`${prefix} failed ${response.status}${shopHint}:${staleTokenHint} ${json == null ? responseText : JSON.stringify(json)}`);
     error.status = response.status;
-    error.body = json;
+    error.body = json || responseText;
     throw error;
   }
   return json;
+}
+
+function parseGraphqlResponse(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function previewText(value) {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  return text.length > 1000 ? `${text.slice(0, 1000)}...` : text;
 }
 
 function compactGraphql(query) {

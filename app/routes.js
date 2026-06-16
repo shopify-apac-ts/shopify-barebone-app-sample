@@ -24,6 +24,7 @@ export default [
   route('customer-account/logout', 'routes/customer-account.logout.jsx'),
   route('customer-account/session', 'routes/customer-account.session.jsx'),
   route('authenticated', 'routes/authenticated.jsx'),
+  route('adminlink.json', 'routes/adminlink-json.jsx'),
   route('mocklogin', 'routes/mocklogin.jsx'),
   route('appproxy', 'routes/appproxy.jsx'),
   route('fulfillment_order_notification', 'routes/fulfillment-order-notification.jsx'),
