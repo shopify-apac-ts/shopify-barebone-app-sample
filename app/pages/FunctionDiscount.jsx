@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { authenticatedFetch } from "../utils/app-bridge";
+import { authenticatedJson } from "../utils/app-bridge";
 import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
@@ -57,8 +57,7 @@ function FunctionDiscount() {
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-01/mutations/discountAutomaticAppCreate"
-                    authenticatedFetch(`/functiondiscount?meta=${meta}&id=${id}`).then((response) => {
-                      response.json().then((json) => {
+                    authenticatedJson(`/functiondiscount.json?meta=${encodeURIComponent(meta)}&id=${encodeURIComponent(id)}`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         if (json.result.response.data.discountAutomaticAppCreate.userErrors.length == 0) {
@@ -66,11 +65,10 @@ function FunctionDiscount() {
                         } else {
                           setResult('Error!');
                         }
-                      }).catch((e) => {
+                    }).catch((e) => {
                         console.log(`${e}`);
                         setAccessing(false);
                         setResult('Error!');
-                      });
                     });
                   }}>
                     Register your discount

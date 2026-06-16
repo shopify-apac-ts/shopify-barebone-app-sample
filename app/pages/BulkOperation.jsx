@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { authenticatedFetch } from "../utils/app-bridge";
+import { authenticatedJson } from "../utils/app-bridge";
 import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
@@ -27,35 +27,31 @@ function BulkOperation() {
         setId(``);
         setUrl(``);
         setPUrl(``);
-        authenticatedFetch(`/bulkoperation?check=${true}`).then((response) => {
-            response.json().then((json) => {
-                console.log(JSON.stringify(json, null, 4));
-                setRes(JSON.stringify(json, null, 4));
-                setId(json.data.currentBulkOperation.id);
-                setUrl(json.data.currentBulkOperation.url);
-                setPUrl(json.data.currentBulkOperation.partialDataUrl);
-            }).catch((e) => {
-                console.log(`${e}`);
-                setRes(``);
-                setId(``);
-                setUrl(``);
-                setPUrl(``);
-            });
+        authenticatedJson(`/bulkoperation.json?check=true`).then((json) => {
+            console.log(JSON.stringify(json, null, 4));
+            setRes(JSON.stringify(json, null, 4));
+            setId(json.data.currentBulkOperation.id);
+            setUrl(json.data.currentBulkOperation.url);
+            setPUrl(json.data.currentBulkOperation.partialDataUrl);
+        }).catch((e) => {
+            console.log(`${e}`);
+            setRes(`${e}`);
+            setId(``);
+            setUrl(``);
+            setPUrl(``);
         });
     };
 
     useEffect(() => {
-        authenticatedFetch(`/bulkoperation?`).then((response) => {
-            response.json().then((json) => {
-                console.log(JSON.stringify(json, null, 4));
-                setData(json);
-                json.data.stagedUploadsCreate.stagedTargets[0].parameters.map((param) => {
-                    if (param.name === 'key') setKey(param.value);
-                });
-            }).catch((e) => {
-                console.log(`${e}`);
-                setData({});
+        authenticatedJson(`/bulkoperation.json`).then((json) => {
+            console.log(JSON.stringify(json, null, 4));
+            setData(json);
+            json.data.stagedUploadsCreate.stagedTargets[0].parameters.map((param) => {
+                if (param.name === 'key') setKey(param.value);
             });
+        }).catch((e) => {
+            console.log(`${e}`);
+            setData({});
         });
         showStatus();
     }, ['']);
@@ -78,20 +74,18 @@ function BulkOperation() {
                             <p>&nbsp;</p>
                             <s-button variant="primary" onClick={() => {
                                 setAccessing(true);
-                                authenticatedFetch(`/bulkoperation?key=${key}`).then((response) => {
-                                    response.json().then((json) => {
-                                        console.log(JSON.stringify(json, null, 4));
-                                        setAccessing(false);
-                                        if (json.data.bulkOperationRunMutation.userErrors.length == 0) {
-                                            setResult('Success!');
-                                        } else {
-                                            setResult(`Error! ${JSON.stringify(json.data.bulkOperationRunMutation.userErrors[0].message)}`);
-                                        }
-                                    }).catch((e) => {
-                                        console.log(`${e}`);
-                                        setAccessing(false);
-                                        setResult('Error!');
-                                    });
+                                authenticatedJson(`/bulkoperation.json?key=${encodeURIComponent(key)}`).then((json) => {
+                                    console.log(JSON.stringify(json, null, 4));
+                                    setAccessing(false);
+                                    if (json.data.bulkOperationRunMutation.userErrors.length == 0) {
+                                        setResult('Success!');
+                                    } else {
+                                        setResult(`Error! ${JSON.stringify(json.data.bulkOperationRunMutation.userErrors[0].message)}`);
+                                    }
+                                }).catch((e) => {
+                                    console.log(`${e}`);
+                                    setAccessing(false);
+                                    setResult('Error!');
                                 });
                             }}>
                                 Run the operation
@@ -120,12 +114,10 @@ function BulkOperation() {
                             <p>&nbsp;</p>
                             <s-button variant="primary" onClick={() => {
                                 setRes(``);
-                                authenticatedFetch(`/bulkoperation?id=${id}`).then((response) => {
-                                    response.json().then((json) => {
-                                        console.log(JSON.stringify(json, null, 4));
-                                    }).catch((e) => {
-                                        console.log(`${e}`);
-                                    });
+                                authenticatedJson(`/bulkoperation.json?id=${encodeURIComponent(id)}`).then((json) => {
+                                    console.log(JSON.stringify(json, null, 4));
+                                }).catch((e) => {
+                                    console.log(`${e}`);
                                 });
                                 showStatus();
                             }}>

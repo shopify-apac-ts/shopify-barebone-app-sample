@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
+import { authenticatedJson, createRedirect, RedirectAction } from "../utils/app-bridge";
 import { getAdminFromShop, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
 
 
@@ -36,20 +36,7 @@ function AdminLink() {
         let cancelled = false;
         setRes('');
 
-        authenticatedFetch(`/adminlink.json?id=${encodeURIComponent(id)}`).then(async (response) => {
-            const text = await response.text();
-            const contentType = response.headers.get('content-type') || 'unknown content type';
-            if (!response.ok) {
-                throw new Error(`Admin Link API failed ${response.status}: ${text.slice(0, 1000)}`);
-            }
-
-            let json;
-            try {
-                json = JSON.parse(text);
-            } catch (error) {
-                throw new Error(`Admin Link API returned ${contentType}, not JSON: ${text.slice(0, 1000)}`);
-            }
-
+        authenticatedJson(`/adminlink.json?id=${encodeURIComponent(id)}`).then((json) => {
             console.log(JSON.stringify(json, null, 4));
             if (!cancelled) setRes(JSON.stringify(json.result, null, 4));
         }).catch((error) => {

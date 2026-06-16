@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
+import { authenticatedJson, createRedirect, RedirectAction } from "../utils/app-bridge";
 import { getAdminFromShop, getQueryParam, getShopFromLocation } from "../utils/shop";
 
 
@@ -8,8 +8,11 @@ import { getAdminFromShop, getQueryParam, getShopFromLocation } from "../utils/s
 function OrderManage() {
     const redirect = createRedirect();
 
-    const shop = getShopFromLocation();
-
+    const [pageContext, setPageContext] = useState({
+        ready: false,
+        id: null,
+        shop: '',
+    });
     const [result, setResult] = useState('');
     const [accessing, setAccessing] = useState(false);
     const [result2, setResult2] = useState('');
@@ -25,27 +28,56 @@ function OrderManage() {
     const uriChange = useCallback((newUri) => setUri(newUri), []);
 
     const [link, setLink] = useState('');
+    const [res, setRes] = useState('');
+    const [foIds, setFoIds] = useState([]);
+    const [trans, setTrans] = useState([]);
 
-    const id = getQueryParam("id");
+    useEffect(() => {
+        setPageContext({
+            ready: true,
+            id: getQueryParam("id"),
+            shop: getShopFromLocation(),
+        });
+    }, []);
+
+    const { ready, id, shop } = pageContext;
+
+    useEffect(() => {
+        if (!id) {
+            setRes('');
+            setFoIds([]);
+            setTrans([]);
+            return undefined;
+        }
+
+        let cancelled = false;
+        setRes('');
+
+        authenticatedJson(`/ordermanage.json?id=${encodeURIComponent(id)}`).then((json) => {
+            console.log(JSON.stringify(json, null, 4));
+            if (cancelled) return;
+            setRes(JSON.stringify(json, null, 4));
+            setFoIds(json.response.order.fulfillmentOrders.edges.map((e) => e.node.id));
+            setTrans(json.response.order.transactions.map((t) => `${t.id}-${t.amountSet.presentmentMoney.amount}`));
+        }).catch((e) => {
+            console.log(`${e}`);
+            if (!cancelled) setRes(`${e}`);
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [id]);
+
+    if (!ready) {
+        return (
+            <s-page heading="Order management">
+                <s-spinner accessibilityLabel="Loading Order management"></s-spinner>
+            </s-page>
+        );
+    }
+
     if (id != null) {
-        const [res, setRes] = useState('');
-        const [foIds, setFoIds] = useState([]);
-        const [trans, setTrans] = useState([]);
-
-        useEffect(() => {
-            authenticatedFetch(`/ordermanage?id=${id}`).then((response) => {
-                response.json().then((json) => {
-                    console.log(JSON.stringify(json, null, 4));
-                    setRes(JSON.stringify(json, null, 4));
-                    setFoIds(json.response.order.fulfillmentOrders.edges.map((e) => e.node.id));
-                    setTrans(json.response.order.transactions.map((t) => `${t.id}-${t.amountSet.presentmentMoney.amount}`));
-                }).catch((e) => {
-                    console.log(`${e}`);
-                    setRes(``);
-                });
-            });
-        }, ['']);
-
         return (
             <s-page heading="Your oder details">
                 <s-stack direction="block" gap="base">
@@ -72,30 +104,26 @@ function OrderManage() {
                     <s-box>
                         <s-button variant="primary" onClick={() => {
                             setRes(``);
-                            authenticatedFetch(`/ordermanage?id=${id}&foids=${foIds}`).then((response) => {
-                                response.json().then((json) => {
-                                    console.log(JSON.stringify(json, null, 4));
-                                    setRes(JSON.stringify(json, null, 4));
-                                    setFoIds(json.response.order.fulfillmentOrders.edges.map((e) => e.node.id));
-                                }).catch((e) => {
-                                    console.log(`${e}`);
-                                    setRes(``);
-                                });
+                            authenticatedJson(`/ordermanage.json?id=${encodeURIComponent(id)}&foids=${encodeURIComponent(foIds.join(','))}`).then((json) => {
+                                console.log(JSON.stringify(json, null, 4));
+                                setRes(JSON.stringify(json, null, 4));
+                                setFoIds(json.response.order.fulfillmentOrders.edges.map((e) => e.node.id));
+                            }).catch((e) => {
+                                console.log(`${e}`);
+                                setRes(`${e}`);
                             });
                         }}>Fulfillment this order</s-button> with <s-badge tone='info'>fulfillment order ids</s-badge> and <s-badge tone='info'>order.fulfillable = true</s-badge>
                     </s-box>
                     <s-box>
                         <s-button variant="primary" onClick={() => {
                             setRes(``);
-                            authenticatedFetch(`/ordermanage?id=${id}&trans=${trans}`).then((response) => {
-                                response.json().then((json) => {
-                                    console.log(JSON.stringify(json, null, 4));
-                                    setRes(JSON.stringify(json, null, 4));
-                                    setTrans(json.response.order.transactions.map((t) => `${t.id}-${t.amountSet.presentmentMoney.amount}`));
-                                }).catch((e) => {
-                                    console.log(`${e}`);
-                                    setRes(``);
-                                });
+                            authenticatedJson(`/ordermanage.json?id=${encodeURIComponent(id)}&trans=${encodeURIComponent(trans.join(','))}`).then((json) => {
+                                console.log(JSON.stringify(json, null, 4));
+                                setRes(JSON.stringify(json, null, 4));
+                                setTrans(json.response.order.transactions.map((t) => `${t.id}-${t.amountSet.presentmentMoney.amount}`));
+                            }).catch((e) => {
+                                console.log(`${e}`);
+                                setRes(`${e}`);
                             });
                         }}>Capture this order</s-button> with <s-badge tone='info'>transaction ids</s-badge> and <s-badge tone='info'>order.capturable = true</s-badge>
                     </s-box>
@@ -134,20 +162,18 @@ function OrderManage() {
                         <s-list-item>
                             <s-button variant="primary" onClick={() => {
                                 setAccessing(true);
-                                authenticatedFetch(`/ordermanage?fs=${true}`).then((response) => {
-                                    response.json().then((json) => {
-                                        console.log(JSON.stringify(json, null, 4));
-                                        setAccessing(false);
-                                        if (json.error === '') {
-                                            setResult('Success!');
-                                        } else {
-                                            setResult(`Error! ${JSON.stringify(json.error)}`);
-                                        }
-                                    }).catch((e) => {
-                                        console.log(`${e}`);
-                                        setAccessing(false);
-                                        setResult('Error!');
-                                    });
+                                authenticatedJson(`/ordermanage.json?fs=true`).then((json) => {
+                                    console.log(JSON.stringify(json, null, 4));
+                                    setAccessing(false);
+                                    if (json.error === '') {
+                                        setResult('Success!');
+                                    } else {
+                                        setResult(`Error! ${JSON.stringify(json.error)}`);
+                                    }
+                                }).catch((e) => {
+                                    console.log(`${e}`);
+                                    setAccessing(false);
+                                    setResult('Error!');
                                 });
                             }}>Create a fulfillment service for this app</s-button>&nbsp;
                             <s-badge tone='info'>Result: <APIResult2 res={result} loading={accessing} /></s-badge>
@@ -206,23 +232,21 @@ function OrderManage() {
                             <br />
                             <s-button variant="primary" onClick={() => {
                                 setAccessing2(true);
-                                authenticatedFetch(`/ordermanage?delta=${delta}&name=${name}&reason=${reason}&uri=${uri}`).then((response) => {
-                                    response.json().then((json) => {
-                                        console.log(JSON.stringify(json, null, 4));
-                                        setAccessing2(false);
-                                        if (json.error === '') {
-                                            setResult2('Success!');
-                                            setLink(`https://${ getAdminFromShop(shop)}/products/inventory?location_id=${json.response.fulfillmentService.location.id.replace('gid://shopify/Location/', '')}`);
-                                        } else {
-                                            setResult2(`Error! ${JSON.stringify(json.error)}`);
-                                            setLink('');
-                                        }
-                                    }).catch((e) => {
-                                        console.log(`${e}`);
-                                        setAccessing2(false);
-                                        setResult2('Error!');
+                                authenticatedJson(`/ordermanage.json?delta=${encodeURIComponent(delta)}&name=${encodeURIComponent(name)}&reason=${encodeURIComponent(reason)}&uri=${encodeURIComponent(uri)}`).then((json) => {
+                                    console.log(JSON.stringify(json, null, 4));
+                                    setAccessing2(false);
+                                    if (json.error === '') {
+                                        setResult2('Success!');
+                                        setLink(`https://${ getAdminFromShop(shop)}/products/inventory?location_id=${json.response.fulfillmentService.location.id.replace('gid://shopify/Location/', '')}`);
+                                    } else {
+                                        setResult2(`Error! ${JSON.stringify(json.error)}`);
                                         setLink('');
-                                    });
+                                    }
+                                }).catch((e) => {
+                                    console.log(`${e}`);
+                                    setAccessing2(false);
+                                    setResult2('Error!');
+                                    setLink('');
                                 });
                             }}>Add inventories to this fulfillment service location</s-button>&nbsp;
                             <s-badge tone='info'>Result: <APIResult2 res={result2} loading={accessing2} /></s-badge>

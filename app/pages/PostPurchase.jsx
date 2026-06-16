@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
+import { authenticatedJson, createRedirect, RedirectAction } from "../utils/app-bridge";
 import { getAdminFromShop, getCurrentHost, getShopFromLocation } from "../utils/shop";
 
 
@@ -47,8 +47,7 @@ function PostPurchase() {
                   </p>
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
-                    authenticatedFetch(`/postpurchase`).then((response) => {
-                      response.json().then((json) => {
+                    authenticatedJson(`/postpurchase.json`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         if (json.result.response.errors == 0) {
@@ -56,11 +55,10 @@ function PostPurchase() {
                         } else {
                           setResult(`Error! ${JSON.stringify(json.result.response)}`);
                         }
-                      }).catch((e) => {
+                    }).catch((e) => {
                         console.log(`${e}`);
                         setAccessing(false);
                         setResult('Error!');
-                      });
                     });
                   }}>
                     Add the app URL to shop metafields

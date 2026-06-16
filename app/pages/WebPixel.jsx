@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { authenticatedFetch } from "../utils/app-bridge";
+import { authenticatedJson } from "../utils/app-bridge";
 import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
@@ -51,8 +51,7 @@ function WebPixel() {
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/webPixelCreate"
-                    authenticatedFetch(`/webpixel?ga4Id=${ga4Id}&ga4Sec=${ga4Sec}&ga4Debug=${ga4Debug}`).then((response) => {
-                      response.json().then((json) => {
+                    authenticatedJson(`/webpixel.json?ga4Id=${encodeURIComponent(ga4Id)}&ga4Sec=${encodeURIComponent(ga4Sec)}&ga4Debug=${encodeURIComponent(ga4Debug)}`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         if (json.result.response.data.webPixelCreate.userErrors.length == 0) {
@@ -60,11 +59,10 @@ function WebPixel() {
                         } else {
                           setResult('Error!');
                         }
-                      }).catch((e) => {
+                    }).catch((e) => {
                         console.log(`${e}`);
                         setAccessing(false);
                         setResult('Error!');
-                      });
                     });
                   }}>
                     Create your Web Pixel

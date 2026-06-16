@@ -22,6 +22,22 @@ export async function authenticatedFetch(url, options = {}) {
   });
 }
 
+export async function authenticatedJson(url, options = {}) {
+  const response = await authenticatedFetch(url, options);
+  const text = await response.text();
+  const contentType = response.headers.get("content-type") || "unknown content type";
+
+  if (!response.ok) {
+    throw new Error(`Request failed ${response.status}: ${text.slice(0, 1000)}`);
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Expected JSON but received ${contentType}: ${text.slice(0, 1000)}`);
+  }
+}
+
 function isAbsoluteHttpUrl(url) {
   try {
     return ["http:", "https:"].includes(new URL(url).protocol);

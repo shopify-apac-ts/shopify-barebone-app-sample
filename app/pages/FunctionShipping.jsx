@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { authenticatedFetch } from "../utils/app-bridge";
+import { authenticatedJson } from "../utils/app-bridge";
 import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
@@ -58,8 +58,7 @@ function FunctionShipping() {
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/deliveryCustomizationCreate"
-                    authenticatedFetch(`/functionshipping?rate=${rate}&zip=${zip}&id=${id}`).then((response) => {
-                      response.json().then((json) => {
+                    authenticatedJson(`/functionshipping.json?rate=${encodeURIComponent(rate)}&zip=${encodeURIComponent(zip)}&id=${encodeURIComponent(id)}`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         if (json.result.response.data.deliveryCustomizationCreate.userErrors.length == 0) {
@@ -67,11 +66,10 @@ function FunctionShipping() {
                         } else {
                           setResult('Error!');
                         }
-                      }).catch((e) => {
+                    }).catch((e) => {
                         console.log(`${e}`);
                         setAccessing(false);
                         setResult('Error!');
-                      });
                     });
                   }}>
                     Create your delivery customization

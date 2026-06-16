@@ -5,39 +5,19 @@ import {
   routeHeaders,
   verifyEmbeddedRequest,
 } from '../lib/http.server.js';
-import { requireAuthenticatedShop } from '../lib/session-token.server.js';
 import {
   callPrivateStorefrontAction,
-  prepareStorefrontAccess,
   renderStorefrontPage,
 } from '../lib/storefront.server.js';
-import { getPublicOrigin } from '../lib/public-url.server.js';
 import Storefront from '../pages/Storefront.jsx';
 
 export async function loader({ request }) {
   const url = new URL(request.url);
-
-  const authContext = await requireAuthenticatedShop(request);
-  if (authContext.ok) {
-    try {
-      const response = await prepareStorefrontAccess(authContext.shop, getPublicOrigin(request));
-      return json({
-        result: {
-          message: '',
-          response,
-        },
-      });
-    } catch (error) {
-      return json({
-        result: {
-          message: error.message,
-          response: {
-            error_count: 1,
-            error_messages: [error.message],
-          },
-        },
-      }, { status: 500 });
-    }
+  const isEmbeddedAppPage = url.searchParams.get('embedded') === '1' || request.headers.has('authorization');
+  if (isEmbeddedAppPage) {
+    const verified = verifyEmbeddedRequest(request);
+    if (!verified.ok) return verified.response;
+    return embeddedHtmlData(verified.shop);
   }
 
   const shop = url.searchParams.get('shop');
@@ -46,9 +26,7 @@ export async function loader({ request }) {
     return renderStorefrontPage(request, { shop, publicToken });
   }
 
-  const verified = verifyEmbeddedRequest(request);
-  if (!verified.ok) return verified.response;
-  return embeddedHtmlData(verified.shop);
+  return new Response('Missing shop', { status: 400 });
 }
 
 export async function action({ request }) {

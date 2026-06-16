@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { authenticatedFetch } from "../utils/app-bridge";
+import { authenticatedJson } from "../utils/app-bridge";
 import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
@@ -58,8 +58,7 @@ function FunctionPayment() {
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/paymentCustomizationCreate"
-                    authenticatedFetch(`/functionpayment?method=${method}&rate=${rate}&id=${id}`).then((response) => {
-                      response.json().then((json) => {
+                    authenticatedJson(`/functionpayment.json?method=${encodeURIComponent(method)}&rate=${encodeURIComponent(rate)}&id=${encodeURIComponent(id)}`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         if (json.result.response.data.paymentCustomizationCreate.userErrors.length == 0) {
@@ -67,11 +66,10 @@ function FunctionPayment() {
                         } else {
                           setResult('Error!');
                         }
-                      }).catch((e) => {
+                    }).catch((e) => {
                         console.log(`${e}`);
                         setAccessing(false);
                         setResult('Error!');
-                      });
                     });
                   }}>
                     Create your payment customization

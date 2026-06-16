@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authenticatedFetch, createRedirect, RedirectAction } from "../utils/app-bridge";
+import { authenticatedJson, createRedirect, RedirectAction } from "../utils/app-bridge";
 import { getShopFromLocation } from "../utils/shop";
 
 
@@ -41,16 +41,14 @@ function Storefront() {
                 <s-list-item>
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
-                    authenticatedFetch(`/storefront`).then((response) => {
-                      response.json().then((json) => {
+                    authenticatedJson(`/storefront.json`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         setResult(json.result.response);
-                      }).catch((e) => {
+                    }).catch((e) => {
                         console.log(`${e}`);
                         setAccessing(false);
                         setResult({});
-                      });
                     });
                   }}>
                     Prepare Storefront API access tokens
