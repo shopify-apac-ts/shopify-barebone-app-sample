@@ -2,25 +2,6 @@ export const API_KEY = process.env.SHOPIFY_API_KEY || '';
 export const API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 export const API_VERSION = process.env.SHOPIFY_API_VERSION || process.env.SHOPIFY_ADMIN_API_VERSION || '2026-04';
 export const APP_URL = process.env.BASE_URL || process.env.SHOPIFY_APP_URL || '';
-export const ACCESS_SCOPES = process.env.SHOPIFY_SCOPES || [
-  'read_customer_events',
-  'read_locations',
-  'unauthenticated_read_product_listings',
-  'unauthenticated_read_selling_plans',
-  'write_app_proxy',
-  'write_assigned_fulfillment_orders',
-  'write_customers',
-  'write_delivery_customizations',
-  'write_discounts',
-  'write_fulfillments',
-  'write_inventory',
-  'write_merchant_managed_fulfillment_orders',
-  'write_orders',
-  'write_payment_customizations',
-  'write_pixels',
-  'write_products',
-  'write_third_party_fulfillment_orders',
-].join(',');
 
 export const CONTENT_TYPE_JSON = 'application/json';
 export const CONTENT_TYPE_FORM = 'application/x-www-form-urlencoded';

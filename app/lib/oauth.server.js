@@ -1,5 +1,4 @@
 import {
-  ACCESS_SCOPES,
   API_KEY,
   API_VERSION,
   API_SECRET,
@@ -90,7 +89,6 @@ export function buildStoredShopData(shop, tokenResponse) {
     shop: normalizeShopDomain(shop),
     client_id: API_KEY,
     api_version: API_VERSION,
-    scopes: ACCESS_SCOPES,
     stored_at: new Date().toISOString(),
   };
 }
@@ -105,7 +103,6 @@ function summarizeShopData(shopData) {
     exists: shopData != null,
     clientId: shopData?.client_id || '',
     legacyScope: shopData?.scope || '',
-    scopes: shopData?.scopes || '',
     storedAt: shopData?.stored_at || '',
     tokenPresent: Boolean(accessToken),
     tokenLength: accessToken.length,

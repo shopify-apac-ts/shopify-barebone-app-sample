@@ -61,9 +61,8 @@ If you are new to this sample, start from these files instead of reading the rep
     | `SHOPIFY_API_KEY` | Always | `YOUR_API_KEY` | Copy from your app settings in the Partner Dashboard. |
     | `SHOPIFY_API_SECRET` | Always | `YOUR_API_SECRET` | Copy from your app settings in the Partner Dashboard. |
     | `SHOPIFY_API_VERSION` | Always | `2026-04` | Use the same version as your app configuration. |
-    | `SHOPIFY_SCOPES` | Optional | `write_products,write_orders,...` | Comma-separated Admin API scopes. If omitted, the sample uses the same default scope string shown in step 6. |
     | `SHOPIFY_APP_URL` | Recommended for hosted environments | `https://YOUR_APP_URL` | Public HTTPS origin used by OAuth and Customer Account API callback URLs. |
-    | `SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID` | Storefront API sample's Customer Account API login flow | `YOUR_CUSTOMER_ACCOUNT_API_CLIENT_ID` | Required only when you test the Customer Account API login flow from the custom storefront sample. |
+    | `SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID` | Storefront API sample's Customer Account API login flow | `YOUR_CUSTOMER_ACCOUNT_API_CLIENT_ID` | Required only when you test the Customer Account API login flow from the custom storefront sample. This is the Customer Account API `client_id`, not the app's `SHOPIFY_API_KEY`. |
     | `SHOPIFY_DB_TYPE` | Always | `MONGODB` / `POSTGRESQL` / `MYSQL` | Defaults to `MONGODB` when omitted. |
     | `SHOPIFY_MONGO_DB_NAME` | `SHOPIFY_DB_TYPE=MONGODB` | `YOUR_DB_NAME` | Any database name is OK. |
     | `SHOPIFY_MONGO_URL` | `SHOPIFY_DB_TYPE=MONGODB` | `mongodb://YOUR_USER:YOUR_PASSWORD@YOUR_DOMAIN:YOUR_PORT/YOUR_DB_NAME` | MongoDB connection string. |
@@ -73,6 +72,8 @@ If you are new to this sample, start from these files instead of reading the rep
     | `SHOPIFY_MYSQL_PASSWORD` | `SHOPIFY_DB_TYPE=MYSQL` | `YOUR_PASSWORD` | MySQL password. |
     | `SHOPIFY_MYSQL_DATABASE` | `SHOPIFY_DB_TYPE=MYSQL` | `YOUR_DB_NAME` | MySQL database name. |
     | `SHOPIFY_WEBHOOK_SECRET` | Manually created `webhookcommon` endpoint testing | `YOUR_TEST_STORE_WEBHOOK_SIGNATURE` | Webhook signature from the webhook creation settings. |
+
+    Customer Account API note: `SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID` is the `client_id` shown in the Customer Account API settings for the application/storefront that uses this login flow. Do not invent a random value in this repository and do not reuse the app's Admin API `client_id` / `SHOPIFY_API_KEY`. Also register `YOUR_APP_URL/customer-account/callback` as an allowed redirect URI for that Customer Account API client before testing the plain storefront login.
 
 3.  If you run it locally, run the following build command (`pnpm install && pnpm run build`). If you use cloud hosting (e.g. Render), use `pnpm install --prod=false` instead to ensure devDependencies (for example React Router's Vite build tooling) are installed even when `NODE_ENV=production`. You can see the details of command definition in `package.json`.
     Use Node.js 20.19.0 or later because the React Router and Vite toolchain require it.
