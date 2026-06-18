@@ -144,18 +144,21 @@
 
     <fieldset class="hidden" id="buyer_step">
       <legend>3. Buyer identity</legend>
+      <p class="muted">Updates the cart's buyerIdentity with the selected country and email address. This helps Shopify calculate buyer-specific context such as international pricing and prefills checkout contact fields.</p>
       <button id="update_buyer">Update Cart buyerIdentity</button>
       <pre id="buyer"></pre>
     </fieldset>
 
     <fieldset class="hidden" id="address_step">
       <legend>4. Delivery address</legend>
+      <p class="muted">Adds a selected delivery address to the cart. When a Customer Account API session exists, this sample uses the customer's default address; otherwise it uses the sample address for the selected locale.</p>
       <button id="add_address">Add selected delivery address</button>
       <pre id="address"></pre>
     </fieldset>
 
     <fieldset class="hidden" id="delivery_step">
       <legend>5. Delivery option</legend>
+      <p class="muted">Selects the first available delivery option from the cart's delivery group. This simulates choosing a shipping method before opening checkout.</p>
       <button id="set_option">Select first delivery option</button>
       <pre id="option"></pre>
     </fieldset>
