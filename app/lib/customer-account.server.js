@@ -121,7 +121,10 @@ export async function completeCustomerAccountLogin(request) {
   console.info('[customer-account] token accepted', JSON.stringify({
     shop: pending.shop,
     hasAccessToken: Boolean(tokenJson.access_token),
+    accessTokenPrefix: getTokenPrefix(tokenJson.access_token),
     hasRefreshToken: Boolean(tokenJson.refresh_token),
+    refreshTokenPrefix: getTokenPrefix(tokenJson.refresh_token),
+    idTokenPrefix: getTokenPrefix(tokenJson.id_token),
     expiresIn: tokenJson.expires_in || null,
   }));
 
@@ -217,7 +220,7 @@ async function getCustomerAccountProfile(shop, accessToken, origin) {
     method: 'POST',
     headers: {
       'Content-Type': CONTENT_TYPE_JSON,
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: accessToken,
       'User-Agent': USER_AGENT,
       Origin: origin,
     },
@@ -301,6 +304,12 @@ function parseCustomerAccountJson(text, label) {
 function truncateForLog(text) {
   if (!text) return '';
   return text.length > 2000 ? `${text.slice(0, 2000)}...` : text;
+}
+
+function getTokenPrefix(token) {
+  if (!token || typeof token !== 'string') return '';
+  const index = token.indexOf('_');
+  return index === -1 ? token.slice(0, 8) : token.slice(0, index + 1);
 }
 
 function createPkceVerifier() {
