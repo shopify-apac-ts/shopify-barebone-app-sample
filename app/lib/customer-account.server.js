@@ -28,7 +28,7 @@ export async function startCustomerAccountLogin({ request, shop, publicToken }) 
   const nonce = uuidv4();
   const verifier = createPkceVerifier();
   const challenge = createPkceChallenge(verifier);
-  const returnTo = url.searchParams.get('return_to') || `/storefront?shop=${shop}&public_token=${publicToken || ''}`;
+  const returnTo = url.searchParams.get('return_to') || `/storefront/plain?shop=${shop}&public_token=${publicToken || ''}`;
   const redirectUri = `${getPublicOrigin(request)}/customer-account/callback`;
 
   pendingStates.set(state, {

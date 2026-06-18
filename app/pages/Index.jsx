@@ -1,5 +1,4 @@
-import { createRedirect, getSessionToken, RedirectAction } from "../utils/app-bridge";
-import { getCurrentHost, getQueryParam } from "../utils/shop";
+import { createRedirect, RedirectAction } from "../utils/app-bridge";
 
 const samples = [
     {
@@ -67,14 +66,6 @@ const samples = [
 // Index for all sample UIs using Polaris web components directly.
 function Index() {
     const redirect = createRedirect();
-
-    // Redirect to the external mock service login to connect the current shop and their users by Session Token validation.
-    if (getQueryParam("external") != null) {
-        getSessionToken().then((sessionToken) => {
-            redirect.dispatch(RedirectAction.REMOTE, `https://${getCurrentHost()}/mocklogin?sessiontoken=${sessionToken}`);
-        });
-        return (<span></span>);
-    }
 
     return (
         <s-page heading="Barebone app samples">

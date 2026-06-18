@@ -72,7 +72,7 @@ function Storefront() {
 
 function buildStorefrontPageUrl(shop, publicToken) {
   if (typeof window === 'undefined' || !shop) return '';
-  const storefrontUrl = new URL('/storefront', window.location.origin);
+  const storefrontUrl = new URL('/storefront/plain', window.location.origin);
   storefrontUrl.searchParams.set('shop', shop);
   if (publicToken) storefrontUrl.searchParams.set('public_token', publicToken);
   return storefrontUrl.toString();

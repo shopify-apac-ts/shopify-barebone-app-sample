@@ -33,6 +33,7 @@ export default [
   route('ordermanage.json', 'routes/ordermanage-json.jsx'),
   route('bulkoperation.json', 'routes/bulkoperation-json.jsx'),
   route('storefront.json', 'routes/storefront-json.jsx'),
+  route('storefront/plain', 'routes/storefront-plain.jsx'),
   route('mocklogin', 'routes/mocklogin.jsx'),
   route('appproxy', 'routes/appproxy.jsx'),
   route('fulfillment_order_notification', 'routes/fulfillment-order-notification.jsx'),
