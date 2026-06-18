@@ -60,6 +60,7 @@ export async function completeCustomerAccountLogin(request) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');
+  const origin = getPublicOrigin(request);
   if (!code || !state) {
     throw new Response('Missing code or state', { status: 400 });
   }
@@ -67,6 +68,10 @@ export async function completeCustomerAccountLogin(request) {
   const pending = pendingStates.get(state);
   pendingStates.delete(state);
   if (pending == null) {
+    console.info('[customer-account] callback state rejected', JSON.stringify({
+      statePresent: Boolean(state),
+      codePresent: Boolean(code),
+    }));
     throw new Response('Invalid or expired state', { status: 400 });
   }
 
@@ -78,22 +83,49 @@ export async function completeCustomerAccountLogin(request) {
   tokenBody.set('code', code);
   tokenBody.set('code_verifier', pending.verifier);
 
+  console.info('[customer-account] token request', JSON.stringify({
+    shop: pending.shop,
+    endpoint: authConfig.token_endpoint,
+    redirectUri: pending.redirectUri,
+    origin,
+    codePresent: Boolean(code),
+  }));
+
   const tokenResponse = await fetch(authConfig.token_endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': CONTENT_TYPE_FORM,
       'User-Agent': USER_AGENT,
+      Origin: origin,
     },
     body: tokenBody,
   });
+  const tokenText = await tokenResponse.text();
+  logCustomerAccountResponse('token response', tokenResponse, tokenText);
   if (!tokenResponse.ok) {
-    throw new Response(`Customer Account API token exchange failed: ${await tokenResponse.text()}`, {
+    throw new Response(`Customer Account API token exchange failed: ${tokenText}`, {
       status: 502,
     });
   }
 
-  const tokenJson = await tokenResponse.json();
-  const profile = await getCustomerAccountProfile(pending.shop, tokenJson.access_token);
+  const tokenJson = parseCustomerAccountJson(tokenText, 'token response');
+  if (!tokenJson.access_token) {
+    console.info('[customer-account] token response missing access token', JSON.stringify({
+      shop: pending.shop,
+      keys: Object.keys(tokenJson),
+    }));
+    throw new Response('Customer Account API token exchange did not return access_token', {
+      status: 502,
+    });
+  }
+  console.info('[customer-account] token accepted', JSON.stringify({
+    shop: pending.shop,
+    hasAccessToken: Boolean(tokenJson.access_token),
+    hasRefreshToken: Boolean(tokenJson.refresh_token),
+    expiresIn: tokenJson.expires_in || null,
+  }));
+
+  const profile = await getCustomerAccountProfile(pending.shop, tokenJson.access_token, origin);
   const sessionId = uuidv4();
   sessions.set(sessionId, {
     shop: pending.shop,
@@ -144,7 +176,9 @@ export function clearCustomerAccountCookie() {
 }
 
 async function discoverCustomerAccountAuthConfig(shop) {
-  const response = await fetch(`https://${shop}/.well-known/openid-configuration`, {
+  const endpoint = `https://${shop}/.well-known/openid-configuration`;
+  console.info('[customer-account] auth discovery request', JSON.stringify({ shop, endpoint }));
+  const response = await fetch(endpoint, {
     headers: {
       Accept: CONTENT_TYPE_JSON,
       'User-Agent': USER_AGENT,
@@ -157,7 +191,9 @@ async function discoverCustomerAccountAuthConfig(shop) {
 }
 
 async function discoverCustomerAccountApiConfig(shop) {
-  const response = await fetch(`https://${shop}/.well-known/customer-account-api`, {
+  const endpoint = `https://${shop}/.well-known/customer-account-api`;
+  console.info('[customer-account] api discovery request', JSON.stringify({ shop, endpoint }));
+  const response = await fetch(endpoint, {
     headers: {
       Accept: CONTENT_TYPE_JSON,
       'User-Agent': USER_AGENT,
@@ -169,14 +205,21 @@ async function discoverCustomerAccountApiConfig(shop) {
   return response.json();
 }
 
-async function getCustomerAccountProfile(shop, accessToken) {
+async function getCustomerAccountProfile(shop, accessToken, origin) {
   const apiConfig = await discoverCustomerAccountApiConfig(shop);
+  console.info('[customer-account] profile request', JSON.stringify({
+    shop,
+    endpoint: apiConfig.graphql_api,
+    origin,
+    hasAccessToken: Boolean(accessToken),
+  }));
   const response = await fetch(apiConfig.graphql_api, {
     method: 'POST',
     headers: {
       'Content-Type': CONTENT_TYPE_JSON,
       Authorization: `Bearer ${accessToken}`,
       'User-Agent': USER_AGENT,
+      Origin: origin,
     },
     body: JSON.stringify({
       query: `query CustomerAccountProfile {
@@ -218,11 +261,46 @@ async function getCustomerAccountProfile(shop, accessToken) {
       }`,
     }),
   });
-  const json = await response.json();
+  const text = await response.text();
+  logCustomerAccountResponse('profile response', response, text);
+  const json = parseCustomerAccountJson(text, 'profile response');
   if (!response.ok || json.errors != null) {
+    console.info('[customer-account] profile rejected', JSON.stringify({
+      status: response.status,
+      errors: json.errors || null,
+      body: !response.ok ? truncateForLog(text) : '',
+    }));
     throw new Error(`Customer Account API profile query failed: ${JSON.stringify(json.errors || json)}`);
   }
   return json.data.customer;
+}
+
+function logCustomerAccountResponse(label, response, text) {
+  const details = {
+    status: response.status,
+    ok: response.ok,
+    wwwAuthenticate: response.headers.get('www-authenticate') || '',
+  };
+  if (!response.ok) details.body = truncateForLog(text);
+  console.info(`[customer-account] ${label}`, JSON.stringify(details));
+}
+
+function parseCustomerAccountJson(text, label) {
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    console.info('[customer-account] json parse failed', JSON.stringify({
+      label,
+      body: truncateForLog(text),
+      message: error.message,
+    }));
+    throw error;
+  }
+}
+
+function truncateForLog(text) {
+  if (!text) return '';
+  return text.length > 2000 ? `${text.slice(0, 2000)}...` : text;
 }
 
 function createPkceVerifier() {
