@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { authenticatedFetch, createRedirect, getSessionToken, RedirectAction } from "../utils/app-bridge";
-import { decodeSessionToken, foldLongLine, getCurrentHost } from "../utils/shop";
+import { authenticatedFetch, createRedirect, decodeSessionToken, getSessionToken, RedirectAction } from "../utils/app-bridge";
+import { foldLongLine, getCurrentHost } from "../utils/shop";
 
 
 // App Bridge Session Token sample

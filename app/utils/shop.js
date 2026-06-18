@@ -1,7 +1,3 @@
-import { decodeSessionToken } from "./app-bridge";
-
-export { decodeSessionToken };
-
 export function getShopFromLocation() {
   if (typeof window === "undefined") return "";
   return new URLSearchParams(window.location.search).get("shop") || "";

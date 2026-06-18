@@ -10,7 +10,6 @@
     "@react-router/dev": "^7.17.0",
     "@react-router/node": "^7.17.0",
     "@react-router/serve": "^7.17.0",
-    "@vitejs/plugin-react": "^6.0.2",
     "isbot": "^5.1.42",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^3.1.2",
