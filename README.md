@@ -170,4 +170,4 @@ All sample are available at [Wiki](../../wiki).
 # Disclaimer
 - This code is fully _unofficial_ and NOT guaranteed to pass [the public app review](https://shopify.dev/apps/store/review) for Shopify app store. The official requirements are described [here](https://shopify.dev/apps/store/requirements). 
 - You need to follow the [Shopify API License and Terms of Use](https://www.shopify.com/legal/api-terms) even for custom app usage.
-- This code is supposed to be used as tutorials mainly for catching up Shopify app dev and does **NOT** guarantee all security covered like [this consideration](https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#network-access). If you use this code for your production, **all responsibilities are owned by you**.
+- This code is supposed to be used as tutorials mainly for catching up Shopify app dev and does **NOT** guarantee all security covered like [this consideration](https://shopify.dev/docs/apps/build/checkout/capabilities#network-access). If you use this code for your production, **all responsibilities are owned by you**.
