@@ -18,7 +18,7 @@ function CheckoutUi() {
         <s-section>
           <s-stack direction="block" gap="base">
             <s-box>
-              <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions" target="_blank">Dev. doc</s-link>
+              <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest" target="_blank">Dev. doc</s-link>
             </s-box>
             <s-box>
               <s-ordered-list>
@@ -33,7 +33,7 @@ function CheckoutUi() {
                 <s-list-item>
                   <p>
                     Add <b>three instances of this app</b> in the locations of <s-badge tone='info'>'<b>purchase.checkout.block.render</b>' = Dynamic / '<b>purchase.checkout.contact.render-after</b>' = Static /
-                      '<b>purchase.checkout.actions.render-before</b>' = Static</s-badge> in <s-link href={`https://${ getAdminFromShop(shop)}/settings/checkout/editor`} target="_blank">checkout editor</s-link>, seeing <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/extension-points-overview" target="_blank">this dev. page</s-link> and set the IP address to <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#block-progress" target="_blank">block</s-link> in their settings. You can check your IP address in external sites
+                      '<b>purchase.checkout.actions.render-before</b>' = Static</s-badge> in <s-link href={`https://${ getAdminFromShop(shop)}/settings/checkout/editor`} target="_blank">checkout editor</s-link>, seeing <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/extension-targets-overview" target="_blank">this dev. page</s-link> and set the IP address to <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/configuration#block-progress" target="_blank">block</s-link> in their settings. You can check your IP address in external sites
                     like <s-link href="https://whatismyipaddress.com/" target="_blank">this</s-link>.
                   </p>
                 </s-list-item>
@@ -65,10 +65,10 @@ function CheckoutUi() {
             </s-box>
             <s-box>
               <p>
-                <b>TIPS: </b>This extension uses its own provided <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#api-access" target="_blank">Storefront API calls</s-link> and app <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/configuration#network-access" target="_blank">server side access</s-link> shared with <s-link href="#" onClick={(event) => {
+                <b>TIPS: </b>This extension uses its own provided <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/configuration#api-access" target="_blank">Storefront API calls</s-link> and app <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/configuration#network-access" target="_blank">server side access</s-link> shared with <s-link href="#" onClick={(event) => {
                   event.preventDefault();
                   redirect.dispatch(RedirectAction.APP, '/postpurchase');
-                }}>Post-purchase sample</s-link> wtih <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/unstable/targets/block/purchase-thank-you-block-render#standardapi-propertydetail-sessiontoken" target="_blank">session tokens</s-link>.
+                }}>Post-purchase sample</s-link> with <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/target-apis/platform-apis/session-token-api" target="_blank">session tokens</s-link>.
               </p>
             </s-box>
           </s-stack>
