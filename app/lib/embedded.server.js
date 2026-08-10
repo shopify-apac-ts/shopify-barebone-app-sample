@@ -22,7 +22,7 @@ export async function embeddedPageLoader({ request, allowAuthenticatedFetch = fa
   }
 
   const verified = verifyEmbeddedRequest(request);
-  if (!verified.ok) return verified.response;
+  if (!verified.ok) throw verified.response;
 
   const { shop } = verified;
   if (!(await hasValidInstallation(shop))) {

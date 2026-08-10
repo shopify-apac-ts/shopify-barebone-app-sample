@@ -134,7 +134,7 @@ If you are new to this sample, start from these files instead of reading the rep
 
 9. Go to the app `Distribution` in your partner dashboard (not dev. dashboard) to select `Public` or `Custom` (if you selected the custom app, use your development store domain for the link). => This is required for [using useShippingAddress() in Checkout UI Extensions](../../../shopify-barebone-app-sample/blob/main/extensions/my-checkout-ui-ext/src/Review.jsx). 
 
-10. If you run it locally, execute the start command (`pnpm run start`). If you use cloud hosting, specify the start command in the appropriate settings or run it directly. Accessing `YOUR_APP_URL` from the browser shows `Bad request` message, but this is expected. Make sure if no other errors happen like 404 / 500.
+10. If you run it locally, execute the start command (`pnpm run start`). If you use cloud hosting, specify the start command in the appropriate settings or run it directly. Unsigned direct access to `YOUR_APP_URL` shows `Bad request` without loading App Bridge or Polaris and without rendering the app shell; this is expected. A valid signed non-embedded Shopify request instead redirects to the plain mock login page that displays the app-generated JWT. Make sure no other errors occur, such as 404 or 500 responses.
 
 # How to install
 Access the following endpoint.

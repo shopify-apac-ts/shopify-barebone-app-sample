@@ -3,7 +3,7 @@ import SessionToken from '../pages/SessionToken.jsx';
 
 export async function loader({ request }) {
   const verified = verifyEmbeddedRequest(request);
-  if (!verified.ok) return verified.response;
+  if (!verified.ok) throw verified.response;
   return embeddedHtmlData(verified.shop);
 }
 
