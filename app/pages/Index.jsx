@@ -1,3 +1,5 @@
+import { navigateApp } from "../utils/app-bridge";
+
 const samples = [
     {
         path: '/sessiontoken',
@@ -74,7 +76,7 @@ function Index() {
                             border="base"
                             paddingInline="base"
                             paddingBlock="small"
-                            href={sample.path}
+                            onClick={() => navigateApp(sample.path)}
                         >
                             <s-grid gridTemplateColumns="1fr auto" gap="base" alignItems="center">
                                 <s-box>

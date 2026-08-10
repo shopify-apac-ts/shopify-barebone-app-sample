@@ -98,7 +98,9 @@ export async function openRemote(url, newContext = false) {
 }
 
 export function navigateApp(path) {
-  return openEmbedded(path);
+  const target = new URL(path, window.location.origin);
+  target.search = window.location.search;
+  return openEmbedded(`${target.pathname}${target.search}${target.hash}`);
 }
 
 function toAdminProtocol(path) {
