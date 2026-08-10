@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useLoaderData } from 'react-router';
 import { authenticatedJson, createRedirect, RedirectAction } from "../utils/app-bridge";
-import { getAdminFromShop, getCurrentHost, getShopFromLocation } from "../utils/shop";
+import { getAdminFromShop, getCurrentHost } from "../utils/shop";
 
 
 // Post-purchase sample
@@ -8,8 +9,7 @@ import { getAdminFromShop, getCurrentHost, getShopFromLocation } from "../utils/
 // Read https://shopify.dev/docs/apps/checkout/post-purchase/getting-started-post-purchase-extension
 function PostPurchase() {
   const redirect = createRedirect();
-
-  const shop = getShopFromLocation();
+  const { shop } = useLoaderData();
 
   const [result, setResult] = useState('');
   const [accessing, setAccessing] = useState(false);
@@ -111,7 +111,7 @@ function PostPurchase() {
                   redirect.dispatch(RedirectAction.APP, '/sessiontoken');
                 }}>
                   Session Token sample
-                </s-link> does. For security considerations, check <s-link href={`https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#network-access`} target='_blank'>this page</s-link>, too.
+                </s-link> does. For security considerations, check <s-link href="https://shopify.dev/docs/apps/build/checkout/capabilities#network-access" target='_blank'>this page</s-link>, too.
               </p>
             </s-box>
           </s-stack>

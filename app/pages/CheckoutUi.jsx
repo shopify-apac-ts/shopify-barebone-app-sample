@@ -1,5 +1,6 @@
+import { useLoaderData } from "react-router";
 import { createRedirect, RedirectAction } from "../utils/app-bridge";
-import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
+import { getAdminFromShop } from "../utils/shop";
 
 
 // Checkout UI sample
@@ -9,8 +10,7 @@ import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 // Read https://shopify.dev/docs/api/checkout-ui-extensions/components
 function CheckoutUi() {
   const redirect = createRedirect();
-
-  const shop = getShopFromLocation();
+  const { shop } = useLoaderData();
 
   return (
     <s-page heading="Checkout UI sample for upselling / store review / IP address blocking">
@@ -33,7 +33,7 @@ function CheckoutUi() {
                 <s-list-item>
                   <p>
                     Add <b>three instances of this app</b> in the locations of <s-badge tone='info'>'<b>purchase.checkout.block.render</b>' = Dynamic / '<b>purchase.checkout.contact.render-after</b>' = Static /
-                      '<b>purchase.checkout.actions.render-before</b>' = Static</s-badge> in <s-link href={`https://${ getAdminFromShop(shop)}/settings/checkout/editor`} target="_blank">checkout editor</s-link>, seeing <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/extension-targets-overview" target="_blank">this dev. page</s-link> and set the IP address to <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/configuration#block-progress" target="_blank">block</s-link> in their settings. You can check your IP address in external sites
+                      '<b>purchase.checkout.actions.render-before</b>' = Static</s-badge> from <s-link href={`https://${ getAdminFromShop(shop)}/settings/checkout`} target="_blank">checkout settings</s-link>, seeing <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/targets/checkout/block" target="_blank">this dev. page</s-link> and set the IP address to <s-link href="https://shopify.dev/docs/apps/build/checkout/capabilities#block-progress" target="_blank">block</s-link> in their settings. You can check your IP address in external sites
                     like <s-link href="https://whatismyipaddress.com/" target="_blank">this</s-link>.
                   </p>
                 </s-list-item>
@@ -65,7 +65,7 @@ function CheckoutUi() {
             </s-box>
             <s-box>
               <p>
-                <b>TIPS: </b>This extension uses its own provided <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/configuration#api-access" target="_blank">Storefront API calls</s-link> and app <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/configuration#network-access" target="_blank">server side access</s-link> shared with <s-link href="#" onClick={(event) => {
+                <b>TIPS: </b>This extension uses its own provided <s-link href="https://shopify.dev/docs/apps/build/checkout/capabilities#storefront-api-access" target="_blank">Storefront API calls</s-link> and app <s-link href="https://shopify.dev/docs/apps/build/checkout/capabilities#network-access" target="_blank">server side access</s-link> shared with <s-link href="#" onClick={(event) => {
                   event.preventDefault();
                   redirect.dispatch(RedirectAction.APP, '/postpurchase');
                 }}>Post-purchase sample</s-link> with <s-link href="https://shopify.dev/docs/api/checkout-ui-extensions/latest/target-apis/platform-apis/session-token-api" target="_blank">session tokens</s-link>.
