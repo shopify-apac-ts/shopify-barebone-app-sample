@@ -1,5 +1,3 @@
-import { createRedirect, RedirectAction } from "../utils/app-bridge";
-
 const samples = [
     {
         path: '/sessiontoken',
@@ -65,8 +63,6 @@ const samples = [
 
 // Index for all sample UIs using Polaris web components directly.
 function Index() {
-    const redirect = createRedirect();
-
     return (
         <s-page heading="Barebone app samples">
             <s-section padding="none">
@@ -78,7 +74,7 @@ function Index() {
                             border="base"
                             paddingInline="base"
                             paddingBlock="small"
-                            onClick={() => redirect.dispatch(RedirectAction.APP, sample.path)}
+                            href={sample.path}
                         >
                             <s-grid gridTemplateColumns="1fr auto" gap="base" alignItems="center">
                                 <s-box>
