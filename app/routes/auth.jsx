@@ -33,7 +33,7 @@ export async function loader({ request }) {
     return redirect(authorizeUrl);
   }
 
-  if (params.has('external') || !isEmbedded(params)) {
+  if (!isEmbedded(params)) {
     return redirect(`/mocklogin?my_token=${createAppJwt({ shop })}`);
   }
 
