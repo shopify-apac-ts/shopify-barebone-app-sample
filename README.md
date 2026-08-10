@@ -25,7 +25,7 @@ For quick start with automatically generated code, go to the [official CLI tutor
 | App extensions root | [extensions/](./extensions/) | Shopify CLI generated extension samples and configuration. These are deployed with `shopify app deploy`. |
 | Admin link extensions | [extensions/my-admin-link-product-details/](./extensions/my-admin-link-product-details/), [extensions/my-admin-link-order-details/](./extensions/my-admin-link-order-details/) | Admin link extension samples that deep-link into this app's embedded pages. |
 | Checkout and customer account extensions | [extensions/my-checkout-ui-ext/](./extensions/my-checkout-ui-ext/), [extensions/my-checkout-ui-ext-2/](./extensions/my-checkout-ui-ext-2/), [extensions/my-checkout-ui-ext-3/](./extensions/my-checkout-ui-ext-3/), [extensions/my-customer-account-ui-ext/](./extensions/my-customer-account-ui-ext/) | UI extension samples for checkout and customer accounts. |
-| Function extensions | [extensions/my-function-discount-ext/](./extensions/my-function-discount-ext/), [extensions/my-function-shipping-ext/](./extensions/my-function-shipping-ext/), [extensions/my-function-payment-ext/](./extensions/my-function-payment-ext/) | Shopify Functions samples written in Rust/Wasm. |
+| Function extensions | [extensions/my-function-discount-ext/](./extensions/my-function-discount-ext/), [extensions/my-function-shipping-ext/](./extensions/my-function-shipping-ext/), [extensions/my-function-payment-ext/](./extensions/my-function-payment-ext/) | Discount, Delivery Customization, and Payment Customization Functions written in Rust/Wasm. |
 | Theme, web pixel, POS, and post-purchase extensions | [extensions/my-theme-app-ext/](./extensions/my-theme-app-ext/), [extensions/my-web-pixel-ext/](./extensions/my-web-pixel-ext/), [extensions/my-pos-ui-ext/](./extensions/my-pos-ui-ext/), [extensions/my-post-purchase-ext/](./extensions/my-post-purchase-ext/) | Additional extension samples that use Shopify CLI extension structure. |
 
 [React Router](https://reactrouter.com/), [React](https://react.dev/) ([JSX](https://react.dev/learn/writing-markup-with-jsx), [Props](https://react.dev/learn/passing-props-to-a-component), [State](https://react.dev/learn/state-a-components-memory), [Hooks](https://react.dev/reference/react/hooks), etc.) and [GraphQL](https://graphql.org/) ([Query](https://graphql.org/learn/queries/), [Edges](https://graphql.org/learn/pagination/#pagination-and-edges), [Union](https://graphql.org/learn/schema/#union-types), etc.) are mandatory technologies for manipulating this sample.
@@ -124,14 +124,11 @@ If you are new to this sample, start from these files instead of reading the rep
 
     In embedded mode, use the Session Token page's **Connect to your service with the session token** button to try the separate [external service connector flow](../../wiki#for-external-service-connection) that authenticates the shop through an App Bridge Session Token.
 
-7. Install [Shopify CLI](https://shopify.dev/docs/api/shopify-cli), execute `shopify app deploy`, and follow its instructions (choose your partner account, connect to the existing app, include your configuration on deploy = YES, etc.) which register extensions to your app. For [Shopify Functions](https://shopify.dev/api/functions) deployment using [Rust](https://www.rust-lang.org/), you need to install [Cargo](https://doc.rust-lang.org/cargo/) Wasm package before executing `shopify app deploy` by `cargo install cargo-wasi`.
-    If you see the **Cargo specific error** for function build (this typically happens in old Rust environment), try the following commands.
+7. Install [Shopify CLI](https://shopify.dev/docs/api/shopify-cli) and the current stable [Rust toolchain](https://www.rust-lang.org/tools/install). Prepare the WebAssembly target used by the Function extensions, then execute `shopify app deploy` and follow its instructions (choose your partner account, connect to the existing app, include your configuration on deploy = YES, etc.).
     ```
-    rustup target remove wasm32-wasi
-
-    rustup update
-
-    rustup target add wasm32-wasip1
+    rustup update stable
+    rustup target add wasm32-unknown-unknown
+    shopify app deploy
     ```
 
 8. Go to the app `API access` in your partner dashboard (not dev. dashboard) to `Allow network access`. => This is required for [using fetch() in Checkout UI Extensions](../../../shopify-barebone-app-sample/blob/main/extensions/my-checkout-ui-ext/src/Upsell.jsx). 

@@ -4,9 +4,7 @@ import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
 // Shopify Functions for payment method sample
-// Read https://shopify.dev/apps/checkout/payment-customizations
-// This sample doesn't use Shopify given libraries for the app UX, create an extention manually. 
-// Read https://shopify.dev/api/functions/reference/payment-customization
+// Read https://shopify.dev/docs/api/functions/latest/payment-customization
 function FunctionPayment() {
 
   const shop = getShopFromLocation();
@@ -17,9 +15,6 @@ function FunctionPayment() {
   const [rate, setRate] = useState('Standard');
   const rateChange = useCallback((newRate) => setRate(newRate), []);
 
-  const [id, setId] = useState('');
-  const idChange = useCallback((newId) => setId(newId), []);
-
   const [result, setResult] = useState('');
   const [accessing, setAccessing] = useState(false);
 
@@ -29,7 +24,7 @@ function FunctionPayment() {
         <s-section>
           <s-stack direction="block" gap="base">
             <s-box>
-              <s-link href="https://shopify.dev/api/functions/reference/payment-customization" target="_blank">Dev. doc</s-link>
+              <s-link href="https://shopify.dev/docs/api/functions/latest/payment-customization" target="_blank">Dev. doc</s-link>
             </s-box>
             <s-box>
               <s-ordered-list>
@@ -46,19 +41,14 @@ function FunctionPayment() {
         <s-section>
           <s-stack direction="block" gap="base">
             <s-box>
-              <s-link href="https://shopify.dev/api/admin-graphql/2023-04/mutations/paymentCustomizationCreate" target="_blank">Dev. doc</s-link>
+              <s-link href="https://shopify.dev/docs/api/admin-graphql/latest/mutations/paymentCustomizationCreate" target="_blank">Dev. doc</s-link>
             </s-box>
             <s-box>
               <s-ordered-list>
                 <s-list-item>
-                  Input your <s-badge>Shopify Functions ID (uid)</s-badge> in <s-badge>extensions/my-function-payment-ext/shopify.extension.toml</s-badge> or <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</s-link>
-                  <s-text-field label="Shopify Function ID" labelAccessibilityVisibility="exclusive" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: db1fde78-bf9a-42ea-afb6-89f0edbb4797"></s-text-field>
-                </s-list-item>
-                <s-list-item>
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
-                    // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/paymentCustomizationCreate"
-                    authenticatedJson(`/functionpayment.json?method=${encodeURIComponent(method)}&rate=${encodeURIComponent(rate)}&id=${encodeURIComponent(id)}`).then((json) => {
+                    authenticatedJson(`/functionpayment.json?method=${encodeURIComponent(method)}&rate=${encodeURIComponent(rate)}`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         if (json.result.response.data.paymentCustomizationCreate.userErrors.length == 0) {

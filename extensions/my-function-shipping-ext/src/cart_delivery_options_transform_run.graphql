@@ -12,7 +12,7 @@ query Input {
   }
   deliveryCustomization {
     metafield(namespace: "barebone_app_function_shipping", key: "filter") {
-      value
+      jsonValue
     }
   }
 }

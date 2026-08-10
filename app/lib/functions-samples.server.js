@@ -4,16 +4,11 @@ import { callAdminGraphql } from './shopify-graphql.server.js';
 export async function createFunctionDiscount(request, context) {
   const url = new URL(request.url);
   const meta = url.searchParams.get('meta') || '';
-  const id = url.searchParams.get('id');
   const [namespace, key] = meta.split('.');
   const response = await callAdminGraphql(context.shop, `mutation DiscountAutomaticAppCreate($automaticAppDiscount: DiscountAutomaticAppInput!) {
     discountAutomaticAppCreate(automaticAppDiscount: $automaticAppDiscount) {
       automaticAppDiscount {
-        appDiscountType {
-          functionId
-          targetType
-        }
-        discountClass
+        discountClasses
         discountId
         title
         startsAt
@@ -30,7 +25,8 @@ export async function createFunctionDiscount(request, context) {
         productDiscounts: true,
         shippingDiscounts: true,
       },
-      functionId: id,
+      discountClasses: ['ORDER'],
+      functionHandle: 'my-function-discount-ext',
       metafields: [
         {
           key: 'customer_meta',
@@ -53,7 +49,6 @@ export async function createDeliveryCustomization(request, context) {
       deliveryCustomization {
         enabled
         id
-        functionId
         title
         metafields(first: 10) {
           edges {
@@ -73,7 +68,7 @@ export async function createDeliveryCustomization(request, context) {
   }`, {
     deliveryCustomization: {
       enabled: true,
-      functionId: url.searchParams.get('id'),
+      functionHandle: 'my-function-shipping-ext',
       metafields: [
         {
           key: 'filter',
@@ -98,7 +93,6 @@ export async function createPaymentCustomization(request, context) {
       paymentCustomization {
         enabled
         id
-        functionId
         title
         metafields(first: 10) {
           edges {
@@ -118,7 +112,7 @@ export async function createPaymentCustomization(request, context) {
   }`, {
     paymentCustomization: {
       enabled: true,
-      functionId: url.searchParams.get('id'),
+      functionHandle: 'my-function-payment-ext',
       metafields: [
         {
           key: 'filter',

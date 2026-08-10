@@ -4,9 +4,7 @@ import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
 // Shopify Functions for shipping method sample
-// Read https://shopify.dev/apps/checkout/delivery-customizations
-// This sample doesn't use Shopify given libraries for the app UX, create an extention manually. 
-// Read https://shopify.dev/api/functions/reference/delivery-customization
+// Read https://shopify.dev/docs/api/functions/latest/delivery-customization
 function FunctionShipping() {
 
   const shop = getShopFromLocation();
@@ -17,9 +15,6 @@ function FunctionShipping() {
   const [zip, setZip] = useState('100-0001');
   const zipChange = useCallback((newZip) => setZip(newZip), []);
 
-  const [id, setId] = useState('');
-  const idChange = useCallback((newId) => setId(newId), []);
-
   const [result, setResult] = useState('');
   const [accessing, setAccessing] = useState(false);
 
@@ -29,7 +24,7 @@ function FunctionShipping() {
         <s-section>
           <s-stack direction="block" gap="base">
             <s-box>
-              <s-link href="https://shopify.dev/api/functions/reference/delivery-customization" target="_blank">Dev. doc</s-link>
+              <s-link href="https://shopify.dev/docs/api/functions/latest/delivery-customization" target="_blank">Dev. doc</s-link>
             </s-box>
             <s-box>
               <s-ordered-list>
@@ -46,19 +41,14 @@ function FunctionShipping() {
         <s-section>
           <s-stack direction="block" gap="base">
             <s-box>
-              <s-link href="https://shopify.dev/api/admin-graphql/2023-04/mutations/deliveryCustomizationCreate" target="_blank">Dev. doc</s-link>
+              <s-link href="https://shopify.dev/docs/api/admin-graphql/latest/mutations/deliveryCustomizationCreate" target="_blank">Dev. doc</s-link>
             </s-box>
             <s-box>
               <s-ordered-list>
                 <s-list-item>
-                  Input your <s-badge>Shopify Functions ID (uid)</s-badge> in <s-badge>extensions/my-function-shipping-ext/shopify.extension.toml</s-badge> or <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</s-link>
-                  <s-text-field label="Shopify Function ID" labelAccessibilityVisibility="exclusive" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: 4269092f-36ee-46e5-85bf-86bea1c8ff51"></s-text-field>
-                </s-list-item>
-                <s-list-item>
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
-                    // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/deliveryCustomizationCreate"
-                    authenticatedJson(`/functionshipping.json?rate=${encodeURIComponent(rate)}&zip=${encodeURIComponent(zip)}&id=${encodeURIComponent(id)}`).then((json) => {
+                    authenticatedJson(`/functionshipping.json?rate=${encodeURIComponent(rate)}&zip=${encodeURIComponent(zip)}`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         if (json.result.response.data.deliveryCustomizationCreate.userErrors.length == 0) {

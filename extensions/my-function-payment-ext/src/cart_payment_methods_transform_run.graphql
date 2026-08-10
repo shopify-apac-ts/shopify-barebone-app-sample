@@ -3,7 +3,6 @@ query Input {
     deliveryGroups {
       selectedDeliveryOption {
         title
-        handle
       }
     }
   }
@@ -13,7 +12,7 @@ query Input {
   }
   paymentCustomization {
     metafield(namespace: "barebone_app_function_payment", key: "filter") {
-      value
+      jsonValue
     }
   }
 }

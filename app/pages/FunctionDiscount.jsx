@@ -4,18 +4,13 @@ import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 
 // Shopify Functions for discounts sample
-// Read https://shopify.dev/apps/discounts
-// This sample doesn't use Shopify given libraries for the app UX, create an extention manually. 
-// Read https://shopify.dev/api/functions/reference/order-discounts/
+// Read https://shopify.dev/docs/api/functions/latest/discount
 function FunctionDiscount() {
 
   const shop = getShopFromLocation();
 
   const [meta, setMeta] = useState('barebone_app.discount_rate');
   const metaChange = useCallback((newMeta) => setMeta(newMeta), []);
-
-  const [id, setId] = useState('');
-  const idChange = useCallback((newId) => setId(newId), []);
 
   const [result, setResult] = useState('');
   const [accessing, setAccessing] = useState(false);
@@ -26,7 +21,7 @@ function FunctionDiscount() {
         <s-section>
           <s-stack direction="block" gap="base">
             <s-box>
-              <s-link href="https://shopify.dev/api/functions/reference/order-discounts/" target="_blank">Dev. doc</s-link>
+              <s-link href="https://shopify.dev/docs/api/functions/latest/discount" target="_blank">Dev. doc</s-link>
             </s-box>
             <s-box>
               <s-ordered-list>
@@ -45,19 +40,14 @@ function FunctionDiscount() {
         <s-section>
           <s-stack direction="block" gap="base">
             <s-box>
-              <s-link href="https://shopify.dev/api/admin-graphql/2023-04/mutations/discountAutomaticAppCreate" target="_blank">Dev. doc</s-link>
+              <s-link href="https://shopify.dev/docs/api/admin-graphql/latest/mutations/discountAutomaticAppCreate" target="_blank">Dev. doc</s-link>
             </s-box>
             <s-box>
               <s-ordered-list>
                 <s-list-item>
-                  Input your <s-badge>Shopify Functions ID (uid)</s-badge> in <s-badge>extensions/my-function-discount-ext/shopify.extension.toml</s-badge> or <s-link href="https://shopify.dev/docs/api/admin-graphql/unstable/queries/shopifyFunctions" target="_blank">Shopify Functions Admin API</s-link>
-                  <s-text-field label="Shopify Function ID" labelAccessibilityVisibility="exclusive" value={id} onInput={(event) => idChange(event.currentTarget.value)} placeholder="Example: 0eb42b0c-f71e-4956-bca2-485b6442ccad"></s-text-field>
-                </s-list-item>
-                <s-list-item>
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
-                    // Read https://shopify.dev/api/admin-graphql/2023-01/mutations/discountAutomaticAppCreate"
-                    authenticatedJson(`/functiondiscount.json?meta=${encodeURIComponent(meta)}&id=${encodeURIComponent(id)}`).then((json) => {
+                    authenticatedJson(`/functiondiscount.json?meta=${encodeURIComponent(meta)}`).then((json) => {
                         console.log(JSON.stringify(json, null, 4));
                         setAccessing(false);
                         if (json.result.response.data.discountAutomaticAppCreate.userErrors.length == 0) {
