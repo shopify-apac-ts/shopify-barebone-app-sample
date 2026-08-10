@@ -32,7 +32,7 @@ export function htmlSecurityHeaders(shop, embedded) {
 }
 
 export function embeddedHtmlData(shop) {
-  return data(null, {
+  return data({ shop }, {
     headers: htmlSecurityHeaders(shop, true),
   });
 }

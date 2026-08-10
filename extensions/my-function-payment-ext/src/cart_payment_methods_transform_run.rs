@@ -31,20 +31,28 @@ fn cart_payment_methods_transform_run(
         return Ok(no_changes);
     }
 
-    let operation = input
+    let configured_method_is_present = input
         .payment_methods()
         .iter()
-        .find(|method| method.name() != &config.method)
+        .any(|method| method.name() == &config.method);
+
+    if !configured_method_is_present {
+        return Ok(no_changes);
+    }
+
+    let operations = input
+        .payment_methods()
+        .iter()
+        .filter(|method| method.name() != &config.method)
         .map(|method| {
             schema::Operation::PaymentMethodHide(schema::PaymentMethodHideOperation {
                 payment_method_id: method.id().clone(),
                 placements: None,
             })
-        });
+        })
+        .collect();
 
-    Ok(schema::CartPaymentMethodsTransformRunResult {
-        operations: operation.into_iter().collect(),
-    })
+    Ok(schema::CartPaymentMethodsTransformRunResult { operations })
 }
 
 #[cfg(test)]
@@ -53,7 +61,7 @@ mod tests {
     use shopify_function::run_function_with_input;
 
     #[test]
-    fn hides_the_first_other_payment_method_for_the_configured_rate() -> Result<()> {
+    fn shows_only_the_configured_payment_method_for_the_configured_rate() -> Result<()> {
         let result = run_function_with_input(
             cart_payment_methods_transform_run,
             r#"{
@@ -64,7 +72,8 @@ mod tests {
                 },
                 "paymentMethods": [
                     { "id": "gid://shopify/PaymentMethod/1", "name": "Credit card" },
-                    { "id": "gid://shopify/PaymentMethod/2", "name": "Cash on Delivery" }
+                    { "id": "gid://shopify/PaymentMethod/2", "name": "Cash on Delivery" },
+                    { "id": "gid://shopify/PaymentMethod/3", "name": "Shop Pay" }
                 ],
                 "paymentCustomization": {
                     "metafield": {
@@ -77,14 +86,43 @@ mod tests {
         assert_eq!(
             result,
             schema::CartPaymentMethodsTransformRunResult {
-                operations: vec![schema::Operation::PaymentMethodHide(
-                    schema::PaymentMethodHideOperation {
+                operations: vec![
+                    schema::Operation::PaymentMethodHide(schema::PaymentMethodHideOperation {
                         payment_method_id: "gid://shopify/PaymentMethod/2".to_string(),
                         placements: None,
-                    },
-                )],
+                    },),
+                    schema::Operation::PaymentMethodHide(schema::PaymentMethodHideOperation {
+                        payment_method_id: "gid://shopify/PaymentMethod/3".to_string(),
+                        placements: None,
+                    },),
+                ],
             }
         );
+        Ok(())
+    }
+
+    #[test]
+    fn returns_no_operations_when_the_configured_method_is_unavailable() -> Result<()> {
+        let result = run_function_with_input(
+            cart_payment_methods_transform_run,
+            r#"{
+                "cart": {
+                    "deliveryGroups": [
+                        { "selectedDeliveryOption": { "title": "Standard" } }
+                    ]
+                },
+                "paymentMethods": [
+                    { "id": "gid://shopify/PaymentMethod/1", "name": "Credit card" }
+                ],
+                "paymentCustomization": {
+                    "metafield": {
+                        "jsonValue": { "method": "Cash on Delivery", "rate": "Standard" }
+                    }
+                }
+            }"#,
+        )?;
+
+        assert!(result.operations.is_empty());
         Ok(())
     }
 

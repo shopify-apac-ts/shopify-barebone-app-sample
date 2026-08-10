@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
+import { useLoaderData } from 'react-router';
 import { authenticatedJson } from "../utils/app-bridge";
-import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
+import { getAdminFromShop } from "../utils/shop";
 
 
 // Shopify Functions for shipping method sample
 // Read https://shopify.dev/docs/api/functions/latest/delivery-customization
 function FunctionShipping() {
-
-  const shop = getShopFromLocation();
+  const { shop } = useLoaderData();
 
   const [rate, setRate] = useState('Standard');
   const rateChange = useCallback((newRate) => setRate(newRate), []);

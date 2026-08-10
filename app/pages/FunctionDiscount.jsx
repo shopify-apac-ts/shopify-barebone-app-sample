@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
+import { useLoaderData } from 'react-router';
 import { authenticatedJson } from "../utils/app-bridge";
-import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
+import { getAdminFromShop } from "../utils/shop";
 
 
 // Shopify Functions for discounts sample
 // Read https://shopify.dev/docs/api/functions/latest/discount
 function FunctionDiscount() {
-
-  const shop = getShopFromLocation();
+  const { shop } = useLoaderData();
 
   const [meta, setMeta] = useState('barebone_app.discount_rate');
   const metaChange = useCallback((newMeta) => setMeta(newMeta), []);

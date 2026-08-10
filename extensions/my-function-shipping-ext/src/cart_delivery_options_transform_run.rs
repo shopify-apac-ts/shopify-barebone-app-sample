@@ -31,21 +31,31 @@ fn cart_delivery_options_transform_run(
         return Ok(no_changes);
     }
 
-    let operation = input
+    let configured_rate_is_present = input
         .cart()
         .delivery_groups()
         .iter()
         .flat_map(|group| group.delivery_options())
-        .find(|option| option.title().is_some_and(|title| title != &config.rate))
+        .any(|option| option.title().is_some_and(|title| title == &config.rate));
+
+    if !configured_rate_is_present {
+        return Ok(no_changes);
+    }
+
+    let operations = input
+        .cart()
+        .delivery_groups()
+        .iter()
+        .flat_map(|group| group.delivery_options())
+        .filter(|option| option.title().is_some_and(|title| title != &config.rate))
         .map(|option| {
             schema::Operation::DeliveryOptionHide(schema::DeliveryOptionHideOperation {
                 delivery_option_handle: option.handle().clone(),
             })
-        });
+        })
+        .collect();
 
-    Ok(schema::CartDeliveryOptionsTransformRunResult {
-        operations: operation.into_iter().collect(),
-    })
+    Ok(schema::CartDeliveryOptionsTransformRunResult { operations })
 }
 
 #[cfg(test)]
@@ -54,7 +64,7 @@ mod tests {
     use shopify_function::run_function_with_input;
 
     #[test]
-    fn hides_the_first_other_delivery_option_for_the_configured_zip() -> Result<()> {
+    fn shows_only_the_configured_delivery_option_for_the_configured_zip() -> Result<()> {
         let result = run_function_with_input(
             cart_delivery_options_transform_run,
             r#"{
@@ -64,7 +74,8 @@ mod tests {
                             "deliveryAddress": { "zip": "100-0001" },
                             "deliveryOptions": [
                                 { "handle": "standard", "title": "Standard" },
-                                { "handle": "express", "title": "Express" }
+                                { "handle": "express", "title": "Express" },
+                                { "handle": "pickup", "title": "Local pickup" }
                             ]
                         }
                     ]
@@ -80,13 +91,43 @@ mod tests {
         assert_eq!(
             result,
             schema::CartDeliveryOptionsTransformRunResult {
-                operations: vec![schema::Operation::DeliveryOptionHide(
-                    schema::DeliveryOptionHideOperation {
+                operations: vec![
+                    schema::Operation::DeliveryOptionHide(schema::DeliveryOptionHideOperation {
                         delivery_option_handle: "express".to_string(),
-                    },
-                )],
+                    },),
+                    schema::Operation::DeliveryOptionHide(schema::DeliveryOptionHideOperation {
+                        delivery_option_handle: "pickup".to_string(),
+                    },),
+                ],
             }
         );
+        Ok(())
+    }
+
+    #[test]
+    fn returns_no_operations_when_the_configured_rate_is_unavailable() -> Result<()> {
+        let result = run_function_with_input(
+            cart_delivery_options_transform_run,
+            r#"{
+                "cart": {
+                    "deliveryGroups": [
+                        {
+                            "deliveryAddress": { "zip": "100-0001" },
+                            "deliveryOptions": [
+                                { "handle": "express", "title": "Express" }
+                            ]
+                        }
+                    ]
+                },
+                "deliveryCustomization": {
+                    "metafield": {
+                        "jsonValue": { "rate": "Standard", "zip": "100-0001" }
+                    }
+                }
+            }"#,
+        )?;
+
+        assert!(result.operations.is_empty());
         Ok(())
     }
 

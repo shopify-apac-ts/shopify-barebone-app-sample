@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
+import { useLoaderData } from 'react-router';
 import { authenticatedJson } from "../utils/app-bridge";
-import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
+import { getAdminFromShop } from "../utils/shop";
 
 
 // Shopify Functions for payment method sample
 // Read https://shopify.dev/docs/api/functions/latest/payment-customization
 function FunctionPayment() {
-
-  const shop = getShopFromLocation();
+  const { shop } = useLoaderData();
 
   const [method, setMethod] = useState('Cash on Delivery (COD)');
   const methodChange = useCallback((newMethod) => setMethod(newMethod), []);
