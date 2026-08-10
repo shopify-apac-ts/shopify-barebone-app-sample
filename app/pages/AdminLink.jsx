@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
 import { authenticatedJson, createRedirect, RedirectAction } from "../utils/app-bridge";
-import { getAdminFromShop, getCurrentUrlWithoutQuery, getQueryParam, getShopFromLocation } from "../utils/shop";
+import { getAdminFromShop, getQueryParam, getShopFromLocation } from "../utils/shop";
 
 
-// Admin link sample with App Bridge redirection
-// Read https://shopify.dev/apps/tools/app-bridge/getting-started/app-setup
+// Admin link extension sample
 // Read https://shopify.dev/apps/app-extensions/getting-started#add-an-admin-link
 function AdminLink() {
     const redirect = createRedirect();
     const [pageContext, setPageContext] = useState({
         ready: false,
         id: null,
-        rawUrl: '',
         shop: '',
     });
     const [res, setRes] = useState('');
@@ -20,12 +18,11 @@ function AdminLink() {
         setPageContext({
             ready: true,
             id: getQueryParam("id"),
-            rawUrl: getCurrentUrlWithoutQuery(),
             shop: getShopFromLocation(),
         });
     }, []);
 
-    const { ready, id, rawUrl, shop } = pageContext;
+    const { ready, id, shop } = pageContext;
 
     useEffect(() => {
         if (!id) {
@@ -88,19 +85,8 @@ function AdminLink() {
     }
 
     return (
-        <s-page heading="Switch the request hanlding for embedded or unembedded.">
+        <s-page heading="Admin Link extension sample">
             <s-stack direction="block" gap="large">
-                <s-section>
-                    <s-unordered-list>
-                        <s-list-item>
-                            This app endpoints (menus) accept embedded requests only with the parameter <s-badge tone="info">embedded</s-badge> = 1 to be protected by <s-link href="https://shopify.dev/apps/auth/oauth/getting-started#step-2-verify-the-installation-request" target="_blank">hmac signature verification</s-link>,
-                            but this page accepts unembedded ones supposed to be <b>accessed outside Shopify to be protected by Shopify login</b> of <s-link href="https://shopify.dev/apps/tools/app-bridge/getting-started/app-setup#initialize-shopify-app-bridge-in-your-app" target="_blank">App Bridge force redirection</s-link> (<s-badge tone="info">forceRedirect: true</s-badge>).
-                        </s-list-item>
-                        <s-list-item>
-                            Copy <s-badge>{`${rawUrl}?shop=${shop}`}</s-badge> to another browser in which you are not logged in to check if the page gets redirected to Shopify login (Disclaimer: the initial page should be blank for production).
-                        </s-list-item>
-                    </s-unordered-list>
-                </s-section>
                 <s-section>
                     <s-unordered-list>
                         <s-list-item>

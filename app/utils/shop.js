@@ -8,11 +8,6 @@ export function getCurrentHost() {
   return window.location.hostname;
 }
 
-export function getCurrentUrlWithoutQuery() {
-  if (typeof window === "undefined") return "";
-  return window.location.href.split("?")[0];
-}
-
 export function getQueryParam(key) {
   if (typeof window === "undefined") return null;
   return new URLSearchParams(window.location.search).get(key);
