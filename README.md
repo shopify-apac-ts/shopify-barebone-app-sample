@@ -85,7 +85,7 @@ If you are new to this sample, start from these files instead of reading the rep
     Start command = pnpm run start (= node server.mjs)
     ```
 
-    `server.mjs` handles the CORS preflight and authenticated POST required when checkout and post-purchase extension Web Workers call `/postpurchase` with a session token, then delegates all other requests to React Router.
+    `server.mjs` handles the CORS preflight and authenticated POST required when checkout and post-purchase extension Web Workers call `/postpurchase` with a Shopify-signed token, then delegates all other requests to React Router.
 
 4. If you run it locally, install a network tunneling tool like [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) and bind your localhost to their provided public URL. If you use cloud hosting, skip this step.
     ```

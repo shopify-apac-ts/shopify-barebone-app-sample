@@ -52,7 +52,7 @@ export function getAdminFromShop(shop) {
 
 export function getShopFromSessionToken(token) {
   const payload = jwtDecode(token);
-  return normalizeShopDomain(payload.dest);
+  return normalizeShopDomain(payload.dest || payload.input_data?.shop?.domain);
 }
 
 export function decodeSessionToken(token) {

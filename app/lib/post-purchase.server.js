@@ -72,7 +72,11 @@ export async function preparePostPurchase(request, context) {
 
 export async function handlePostPurchaseAction(request) {
   const context = await requireAuthenticatedShop(request);
-  if (!context.ok) return postPurchaseJson({ Error: 'Signature unmatched. Incorrect authentication bearer sent' }, { status: 400 });
+  if (!context.ok) {
+    const message = context.response?.result?.message || 'Authorization failed';
+    console.info('[postpurchase] authentication failed', JSON.stringify({ status: context.status, message }));
+    return postPurchaseJson({ Error: message }, { status: context.status || 400 });
+  }
 
   const url = new URL(request.url);
   const payload = decodeSessionToken(context.token);
@@ -83,7 +87,11 @@ export async function handlePostPurchaseAction(request) {
   let responseData = {};
   const upsellProductIds = url.searchParams.get('upsell_product_ids');
   if (upsellProductIds) {
-    const query = JSON.parse(upsellProductIds).map((id) => `id:${id}`).join(' OR ');
+    const query = JSON.parse(upsellProductIds)
+      .filter((id) => id != null && String(id).trim() !== '')
+      .map((id) => `id:${id}`)
+      .join(' OR ');
+    if (!query) return postPurchaseJson(responseData);
     const response = await callAdminGraphql(shop, `query UpsellProducts($query: String!) {
       products(first: 10, query: $query) {
         edges {
