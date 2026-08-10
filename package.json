@@ -1,6 +1,7 @@
 {
   "name": "my-shopify-barebone-app",
   "version": "1.0.0",
+  "type": "module",
   "description": "@shopify/cli must be installed by `npm install -g @shopify/cli`, and @shopify/app is used by `@shopify/ui-extensions-react` only.",
   "main": "build/server/index.js",
   "engines": {
@@ -8,8 +9,9 @@
   },
   "dependencies": {
     "@react-router/dev": "^7.17.0",
+    "@react-router/express": "^7.17.0",
     "@react-router/node": "^7.17.0",
-    "@react-router/serve": "^7.17.0",
+    "express": "^4.22.2",
     "isbot": "^5.1.42",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^3.1.2",
@@ -24,7 +26,7 @@
   },
   "scripts": {
     "build": "react-router build",
-    "start": "react-router-serve ./build/server/index.js"
+    "start": "node server.mjs"
   },
   "keywords": [],
   "author": "",

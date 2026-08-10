@@ -6,6 +6,22 @@ import { createAppJwt, decodeSessionToken } from './shopify-auth.server.js';
 import { callAdminGraphql } from './shopify-graphql.server.js';
 import { getPublicOrigin } from './public-url.server.js';
 
+export const postPurchaseCorsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+};
+
+function postPurchaseJson(data, init = {}) {
+  return json(data, {
+    ...init,
+    headers: {
+      ...postPurchaseCorsHeaders,
+      ...(init.headers || {}),
+    },
+  });
+}
+
 export async function preparePostPurchase(request, context) {
   const origin = getPublicOrigin(request);
   const errors = {
@@ -56,7 +72,7 @@ export async function preparePostPurchase(request, context) {
 
 export async function handlePostPurchaseAction(request) {
   const context = await requireAuthenticatedShop(request);
-  if (!context.ok) return json({ Error: 'Signature unmatched. Incorrect authentication bearer sent' }, { status: 400 });
+  if (!context.ok) return postPurchaseJson({ Error: 'Signature unmatched. Incorrect authentication bearer sent' }, { status: 400 });
 
   const url = new URL(request.url);
   const payload = decodeSessionToken(context.token);
@@ -139,5 +155,5 @@ export async function handlePostPurchaseAction(request) {
     responseData = response.data;
   }
 
-  return json(responseData);
+  return postPurchaseJson(responseData);
 }
