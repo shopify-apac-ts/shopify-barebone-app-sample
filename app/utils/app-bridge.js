@@ -100,7 +100,8 @@ export async function openRemote(url, newContext = false) {
 export function navigateApp(path) {
   const target = new URL(path, window.location.origin);
   const params = new URLSearchParams(window.location.search);
-  for (const key of ["embedded", "hmac", "host", "locale", "shop", "timestamp"]) {
+  // HMAC covers the complete Shopify launch query, including these transient values.
+  for (const key of ["embedded", "hmac", "host", "id_token", "locale", "session", "shop", "timestamp"]) {
     if (params.has(key) && !target.searchParams.has(key)) {
       target.searchParams.set(key, params.get(key));
     }
