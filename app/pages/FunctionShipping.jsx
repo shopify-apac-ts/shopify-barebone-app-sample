@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useLoaderData } from 'react-router';
-import { callAdminGraphql } from '../utils/admin-graphql';
+import { callDirectAdminGraphql } from '../utils/direct-admin-graphql';
 import { getAdminFromShop } from "../utils/shop";
 
 const CREATE_DELIVERY_CUSTOMIZATION = `mutation DeliveryCustomizationCreate($deliveryCustomization: DeliveryCustomizationInput!) {
@@ -71,7 +71,7 @@ function FunctionShipping() {
                 <s-list-item>
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
-                    callAdminGraphql(CREATE_DELIVERY_CUSTOMIZATION, {
+                    callDirectAdminGraphql(CREATE_DELIVERY_CUSTOMIZATION, {
                       deliveryCustomization: {
                         enabled: true,
                         functionHandle: 'my-function-shipping-ext',

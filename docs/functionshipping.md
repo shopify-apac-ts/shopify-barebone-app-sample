@@ -62,7 +62,7 @@ If any delivery group has the configured postal code, the Function creates hide 
 ## Source Map
 
 - [`app/pages/FunctionShipping.jsx`](../app/pages/FunctionShipping.jsx): configuration UI and `deliveryCustomizationCreate` mutation
-- [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js): shared App Bridge Direct API client
+- [`app/utils/direct-admin-graphql.js`](../app/utils/direct-admin-graphql.js): shared App Bridge Direct API client
 - [`extensions/my-function-shipping-ext/src/cart_delivery_options_transform_run.graphql`](../extensions/my-function-shipping-ext/src/cart_delivery_options_transform_run.graphql): runtime input
 - [`extensions/my-function-shipping-ext/src/cart_delivery_options_transform_run.rs`](../extensions/my-function-shipping-ext/src/cart_delivery_options_transform_run.rs): filtering logic and tests
 - [`extensions/my-function-shipping-ext/shopify.extension.toml`](../extensions/my-function-shipping-ext/shopify.extension.toml): Function target configuration

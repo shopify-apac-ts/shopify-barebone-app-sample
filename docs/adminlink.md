@@ -65,7 +65,7 @@ Direct API access must be enabled in `shopify.app.toml` with `[access.admin].emb
 - [`extensions/my-admin-link-order-details/shopify.extension.toml`](../extensions/my-admin-link-order-details/shopify.extension.toml): order action target
 - [`app/pages/AdminLink.jsx`](../app/pages/AdminLink.jsx): browser UI
 - [`app/routes/adminlink.jsx`](../app/routes/adminlink.jsx): embedded page route
-- [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js): browser-side Direct Admin API helper
+- [`app/utils/direct-admin-graphql.js`](../app/utils/direct-admin-graphql.js): browser-side Direct Admin API helper
 
 ## Official Shopify References
 

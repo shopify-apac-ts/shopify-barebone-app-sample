@@ -257,7 +257,7 @@ Render, Node.js, React Router, and MongoDB are this repository's concrete choice
 | Embedded and authenticated endpoint helpers | [`app/lib/embedded.server.js`](../app/lib/embedded.server.js) |
 | Session-token verification | [`app/lib/session-token.server.js`](../app/lib/session-token.server.js) |
 | Browser App Bridge helpers | [`app/utils/app-bridge.js`](../app/utils/app-bridge.js) |
-| Browser Direct Admin API helper | [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js) |
+| Browser Direct Admin API helper | [`app/utils/direct-admin-graphql.js`](../app/utils/direct-admin-graphql.js) |
 | Shopify GraphQL client | [`app/lib/shopify-graphql.server.js`](../app/lib/shopify-graphql.server.js) |
 
 ## Official References

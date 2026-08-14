@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createRedirect, RedirectAction } from "../utils/app-bridge";
-import { callAdminGraphql } from "../utils/admin-graphql";
+import { callDirectAdminGraphql } from "../utils/direct-admin-graphql";
 import { getAdminFromShop, getQueryParam, getShopFromLocation } from "../utils/shop";
 
 const ADMIN_LINKED_PRODUCT_QUERY = `query AdminLinkedProduct($id: ID!) {
@@ -62,7 +62,7 @@ function AdminLink() {
         let cancelled = false;
         setRes('');
 
-        callAdminGraphql(ADMIN_LINKED_PRODUCT_QUERY, {
+        callDirectAdminGraphql(ADMIN_LINKED_PRODUCT_QUERY, {
             id: `gid://shopify/Product/${id}`,
         }).then((response) => {
             const json = {

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { callAdminGraphql } from '../utils/admin-graphql';
+import { callDirectAdminGraphql } from '../utils/direct-admin-graphql';
 import { getAdminFromShop, getShopFromLocation } from "../utils/shop";
 
 const CREATE_WEB_PIXEL = `mutation WebPixelCreate($webPixel: WebPixelInput!) {
@@ -64,7 +64,7 @@ function WebPixel() {
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     // Read https://shopify.dev/api/admin-graphql/2023-04/mutations/webPixelCreate"
-                    callAdminGraphql(CREATE_WEB_PIXEL, {
+                    callDirectAdminGraphql(CREATE_WEB_PIXEL, {
                       webPixel: {
                         settings: JSON.stringify({ ga4Id, ga4Sec, ga4Debug: String(ga4Debug) }),
                       },

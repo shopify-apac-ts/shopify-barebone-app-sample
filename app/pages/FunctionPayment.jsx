@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useLoaderData } from 'react-router';
-import { callAdminGraphql } from '../utils/admin-graphql';
+import { callDirectAdminGraphql } from '../utils/direct-admin-graphql';
 import { getAdminFromShop } from "../utils/shop";
 
 const CREATE_PAYMENT_CUSTOMIZATION = `mutation PaymentCustomizationCreate($paymentCustomization: PaymentCustomizationInput!) {
@@ -71,7 +71,7 @@ function FunctionPayment() {
                 <s-list-item>
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
-                    callAdminGraphql(CREATE_PAYMENT_CUSTOMIZATION, {
+                    callDirectAdminGraphql(CREATE_PAYMENT_CUSTOMIZATION, {
                       paymentCustomization: {
                         enabled: true,
                         functionHandle: 'my-function-payment-ext',

@@ -62,7 +62,7 @@ At runtime, the Function checks that order discounts are supported, prefers the 
 ## Source Map
 
 - [`app/pages/FunctionDiscount.jsx`](../app/pages/FunctionDiscount.jsx): registration UI and `discountAutomaticAppCreate` mutation
-- [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js): shared App Bridge Direct API client
+- [`app/utils/direct-admin-graphql.js`](../app/utils/direct-admin-graphql.js): shared App Bridge Direct API client
 - [`extensions/my-function-discount-ext/src/cart_lines_discounts_generate_run.graphql`](../extensions/my-function-discount-ext/src/cart_lines_discounts_generate_run.graphql): runtime input query
 - [`extensions/my-function-discount-ext/src/cart_lines_discounts_generate_run.rs`](../extensions/my-function-discount-ext/src/cart_lines_discounts_generate_run.rs): Function logic and tests
 - [`extensions/my-function-discount-ext/shopify.extension.toml`](../extensions/my-function-discount-ext/shopify.extension.toml): extension configuration

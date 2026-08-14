@@ -99,7 +99,7 @@ Only the merchant-facing setup action uses Direct API access. Product lookup, ch
 ## Source Map
 
 - [`app/pages/PostPurchase.jsx`](../app/pages/PostPurchase.jsx): setup UI, shop query, and `metafieldsSet` mutation
-- [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js): shared App Bridge Direct API client
+- [`app/utils/direct-admin-graphql.js`](../app/utils/direct-admin-graphql.js): shared App Bridge Direct API client
 - [`app/routes/postpurchase.jsx`](../app/routes/postpurchase.jsx): extension-facing action route
 - [`app/lib/post-purchase.server.js`](../app/lib/post-purchase.server.js): product lookup, token signing, and review update
 - [`server.mjs`](../server.mjs): early CORS preflight handling

@@ -62,7 +62,7 @@ For a valid positive percentage, the Function calculates `price * (1 + percentag
 ## Source Map
 
 - [`app/pages/FunctionCart.jsx`](../app/pages/FunctionCart.jsx): registration UI and `cartTransformCreate` mutation
-- [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js): shared App Bridge Direct API client
+- [`app/utils/direct-admin-graphql.js`](../app/utils/direct-admin-graphql.js): shared App Bridge Direct API client
 - [`extensions/my-function-cart-ext/src/cart_transform_run.graphql`](../extensions/my-function-cart-ext/src/cart_transform_run.graphql): runtime input
 - [`extensions/my-function-cart-ext/src/cart_transform_run.rs`](../extensions/my-function-cart-ext/src/cart_transform_run.rs): pricing logic and tests
 - [`extensions/my-function-cart-ext/shopify.extension.toml`](../extensions/my-function-cart-ext/shopify.extension.toml): extension configuration

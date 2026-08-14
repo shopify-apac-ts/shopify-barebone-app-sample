@@ -62,7 +62,7 @@ When the configured delivery title is selected, the Function iterates through pa
 ## Source Map
 
 - [`app/pages/FunctionPayment.jsx`](../app/pages/FunctionPayment.jsx): settings UI and `paymentCustomizationCreate` mutation
-- [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js): shared App Bridge Direct API client
+- [`app/utils/direct-admin-graphql.js`](../app/utils/direct-admin-graphql.js): shared App Bridge Direct API client
 - [`extensions/my-function-payment-ext/src/cart_payment_methods_transform_run.graphql`](../extensions/my-function-payment-ext/src/cart_payment_methods_transform_run.graphql): runtime input
 - [`extensions/my-function-payment-ext/src/cart_payment_methods_transform_run.rs`](../extensions/my-function-payment-ext/src/cart_payment_methods_transform_run.rs): filtering logic and tests
 - [`extensions/my-function-payment-ext/shopify.extension.toml`](../extensions/my-function-payment-ext/shopify.extension.toml): Function target configuration

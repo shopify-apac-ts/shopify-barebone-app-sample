@@ -66,7 +66,7 @@ The extension explicitly declares its customer privacy behavior. An app Web Pixe
 ## Source Map
 
 - [`app/pages/WebPixel.jsx`](../app/pages/WebPixel.jsx): registration UI and `webPixelCreate` mutation
-- [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js): shared App Bridge Direct API client and secret-safe logging
+- [`app/utils/direct-admin-graphql.js`](../app/utils/direct-admin-graphql.js): shared App Bridge Direct API client and secret-safe logging
 - [`extensions/my-web-pixel-ext/src/index.js`](../extensions/my-web-pixel-ext/src/index.js): event subscriptions
 - [`extensions/my-web-pixel-ext/src/ga4.js`](../extensions/my-web-pixel-ext/src/ga4.js): GA4 payload conversion and delivery
 - [`extensions/my-web-pixel-ext/src/index.test.js`](../extensions/my-web-pixel-ext/src/index.test.js): pixel behavior tests

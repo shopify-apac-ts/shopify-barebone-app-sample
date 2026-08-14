@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useLoaderData } from 'react-router';
-import { callAdminGraphql } from '../utils/admin-graphql';
+import { callDirectAdminGraphql } from '../utils/direct-admin-graphql';
 import { getAdminFromShop } from '../utils/shop';
 
 const CREATE_CART_TRANSFORM = `mutation CartTransformCreate($functionHandle: String!, $metafields: [MetafieldInput!]) {
@@ -62,7 +62,7 @@ function FunctionCart() {
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     const [namespace, key] = meta.split('.');
-                    callAdminGraphql(CREATE_CART_TRANSFORM, {
+                    callDirectAdminGraphql(CREATE_CART_TRANSFORM, {
                       functionHandle: 'my-function-cart-ext',
                       metafields: [
                         {

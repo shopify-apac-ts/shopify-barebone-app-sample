@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useLoaderData } from 'react-router';
-import { callAdminGraphql } from '../utils/admin-graphql';
+import { callDirectAdminGraphql } from '../utils/direct-admin-graphql';
 import { getAdminFromShop } from "../utils/shop";
 
 const CREATE_DISCOUNT = `mutation DiscountAutomaticAppCreate($automaticAppDiscount: DiscountAutomaticAppInput!) {
@@ -63,7 +63,7 @@ function FunctionDiscount() {
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     const [namespace, key] = meta.split('.');
-                    callAdminGraphql(CREATE_DISCOUNT, {
+                    callDirectAdminGraphql(CREATE_DISCOUNT, {
                       automaticAppDiscount: {
                         combinesWith: {
                           orderDiscounts: true,

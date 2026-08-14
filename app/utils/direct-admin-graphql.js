@@ -1,6 +1,6 @@
 const DEFAULT_API_VERSION = '2026-04';
 
-export async function callAdminGraphql(query, variables = null) {
+export async function callDirectAdminGraphql(query, variables = null) {
   const apiVersion = document
     .querySelector('meta[name="shopify-api-version"]')
     ?.getAttribute('content') || DEFAULT_API_VERSION;

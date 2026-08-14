@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLoaderData } from 'react-router';
-import { callAdminGraphql } from '../utils/admin-graphql';
+import { callDirectAdminGraphql } from '../utils/direct-admin-graphql';
 import { createRedirect, RedirectAction } from "../utils/app-bridge";
 import { getAdminFromShop, getCurrentHost } from "../utils/shop";
 
@@ -68,8 +68,8 @@ function PostPurchase() {
                   <s-button variant="primary" onClick={() => {
                     setAccessing(true);
                     const errors = { errors: 0, apis: [] };
-                    callAdminGraphql(GET_SHOP_ID).then((shopResponse) => {
-                      return callAdminGraphql(SET_SHOP_METAFIELD, {
+                    callDirectAdminGraphql(GET_SHOP_ID).then((shopResponse) => {
+                      return callDirectAdminGraphql(SET_SHOP_METAFIELD, {
                         metafields: [
                           {
                             key: 'url',
