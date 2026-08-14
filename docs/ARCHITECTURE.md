@@ -126,22 +126,22 @@ The initial HMAC and later JWT solve different problems:
 
 ## Direct Admin API Request
 
-The Admin Link product sample is intentionally simpler. Its embedded page uses the App Bridge Resource Fetching API and the `shopify:admin` URL scheme, so Shopify authenticates the GraphQL request without sending it through the app server. The deployed app configuration must enable Direct API access and declare the required Admin API scopes.
+The Admin Link product query and the merchant-triggered Function, Web Pixel, and post-purchase setup operations use the App Bridge Resource Fetching API and the `shopify:admin` URL scheme. Shopify authenticates these GraphQL requests without sending them through the app server. The deployed app configuration must enable Direct API access and declare the required Admin API scopes.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Browser as Embedded Admin Link page
+    participant Browser as Embedded Admin page
     participant Bridge as App Bridge
     participant API as Shopify Admin GraphQL API
 
-    Browser->>Bridge: fetch shopify:admin product query
+    Browser->>Bridge: fetch shopify:admin query or mutation
     Bridge->>API: Forward authenticated GraphQL request
-    API-->>Bridge: Product data or GraphQL errors
+    API-->>Bridge: GraphQL data or errors
     Bridge-->>Browser: GraphQL JSON response
 ```
 
-This flow does not expose an Admin access token to the browser. It also does not replace server routes used by the non-embedded Service Connector, App Proxy, webhooks, Storefront token management, POS printing, or other backend-dependent samples.
+This flow does not expose an Admin access token to the browser. It removes the need for one-purpose app-server endpoints for these operations, but it does not replace server routes used by OAuth, the non-embedded Service Connector, App Proxy, webhooks, Storefront token management, post-purchase runtime processing, POS printing, or other backend-dependent samples.
 
 ## Browser and Server Module Boundaries
 
@@ -159,12 +159,18 @@ sequenceDiagram
     Browser->>RouteUI: Hydrate route component
     RouteUI->>Page: Render page UI
     Page->>Bridge: Use navigation, ID token, and web components
-    Page->>HTTP: Fetch protected .json endpoint
-    HTTP->>RouteData: Dispatch request on remote server
-    RouteData->>Lib: Verify and execute server logic
-    Lib->>Shopify: Send authenticated API request
-    Shopify-->>Lib: Return data
-    Lib-->>Page: Return JSON across HTTP boundary
+    alt Direct Admin API operation
+        Page->>Bridge: fetch shopify:admin GraphQL
+        Bridge->>Shopify: Forward authenticated Admin API request
+        Shopify-->>Page: Return GraphQL JSON through App Bridge
+    else Backend-dependent operation
+        Page->>HTTP: Fetch protected .json endpoint
+        HTTP->>RouteData: Dispatch request on remote server
+        RouteData->>Lib: Verify and execute server logic
+        Lib->>Shopify: Send authenticated API request
+        Shopify-->>Lib: Return data
+        Lib-->>Page: Return JSON across HTTP boundary
+    end
 ```
 
 Do not import secrets or server-only modules into page components. Environment variables, OAuth tokens, database access, and Admin API credentials must remain behind the HTTP boundary.
@@ -207,18 +213,18 @@ sequenceDiagram
     autonumber
     actor Merchant
     participant UI as Embedded management UI
-    participant App as Remote app server
+    participant Bridge as App Bridge Direct API access
     participant AdminAPI as Shopify Admin GraphQL API
     participant Config as Function owner and metafield
     participant Checkout as Shopify cart or checkout
     participant Wasm as Deployed Function Wasm
 
     Merchant->>UI: Register customization
-    UI->>App: Authenticated request with settings
-    App->>AdminAPI: Create discount or customization
+    UI->>Bridge: fetch shopify:admin with settings
+    Bridge->>AdminAPI: Create discount or customization
     AdminAPI->>Config: Persist function handle and metafield
     AdminAPI-->>UI: Registration result
-    Note over App,Wasm: The app server is not called during Function execution
+    Note over UI,Wasm: The remote app server is not called during registration or Function execution
     Checkout->>Wasm: Invoke with generated GraphQL input
     Config-->>Wasm: Include configured metafield data
     Wasm-->>Checkout: Return operations
