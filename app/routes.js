@@ -28,7 +28,6 @@ export default [
   route('customer-account/logout', 'routes/customer-account.logout.jsx'),
   route('customer-account/session', 'routes/customer-account.session.jsx'),
   route('authenticated', 'routes/authenticated.jsx'),
-  route('adminlink.json', 'routes/adminlink-json.jsx'),
   route('functiondiscount.json', 'routes/functiondiscount-json.jsx'),
   route('functionshipping.json', 'routes/functionshipping-json.jsx'),
   route('functionpayment.json', 'routes/functionpayment-json.jsx'),
