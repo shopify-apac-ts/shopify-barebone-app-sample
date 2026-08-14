@@ -90,9 +90,9 @@ sequenceDiagram
 
 The sample hosts `/mocklogin` on the same server, but it represents a separate external system in this architecture. The app-owned JWT is not a Shopify session token and does not grant Admin API access. A production connector should use the verified shop to establish its own server-side session, keep the handoff token short-lived and single-purpose, and avoid retaining it in URLs or logs. This differs from the embedded Session Token page's connector demonstration, where App Bridge supplies a Shopify-signed session token before opening the external page.
 
-## Normal Embedded Page and API Request
+## Normal Embedded Page and Server-backed API Request
 
-After installation, the signed initial page request establishes the embedded document. Browser-side code then obtains a fresh App Bridge token for each protected app-server request.
+After installation, the signed initial page request establishes the embedded document. Browser-side code then obtains a fresh App Bridge token for each protected app-server request. This flow remains in use when a feature needs application secrets, stored installation data, external integrations, or server-side orchestration.
 
 ```mermaid
 sequenceDiagram
@@ -123,6 +123,25 @@ The initial HMAC and later JWT solve different problems:
 - The query HMAC protects the server-rendered entry request from forged Shopify parameters.
 - The session-token JWT authenticates a browser or extension request to the app server.
 - The offline Admin OAuth token authorizes the app server to call the Admin API for that shop.
+
+## Direct Admin API Request
+
+The Admin Link product sample is intentionally simpler. Its embedded page uses the App Bridge Resource Fetching API and the `shopify:admin` URL scheme, so Shopify authenticates the GraphQL request without sending it through the app server. The deployed app configuration must enable Direct API access and declare the required Admin API scopes.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Browser as Embedded Admin Link page
+    participant Bridge as App Bridge
+    participant API as Shopify Admin GraphQL API
+
+    Browser->>Bridge: fetch shopify:admin product query
+    Bridge->>API: Forward authenticated GraphQL request
+    API-->>Bridge: Product data or GraphQL errors
+    Bridge-->>Browser: GraphQL JSON response
+```
+
+This flow does not expose an Admin access token to the browser. It also does not replace server routes used by the non-embedded Service Connector, App Proxy, webhooks, Storefront token management, POS printing, or other backend-dependent samples.
 
 ## Browser and Server Module Boundaries
 
@@ -232,6 +251,7 @@ Render, Node.js, React Router, and MongoDB are this repository's concrete choice
 | Embedded and authenticated endpoint helpers | [`app/lib/embedded.server.js`](../app/lib/embedded.server.js) |
 | Session-token verification | [`app/lib/session-token.server.js`](../app/lib/session-token.server.js) |
 | Browser App Bridge helpers | [`app/utils/app-bridge.js`](../app/utils/app-bridge.js) |
+| Browser Direct Admin API helper | [`app/utils/admin-graphql.js`](../app/utils/admin-graphql.js) |
 | Shopify GraphQL client | [`app/lib/shopify-graphql.server.js`](../app/lib/shopify-graphql.server.js) |
 
 ## Official References
@@ -240,6 +260,7 @@ Render, Node.js, React Router, and MongoDB are this repository's concrete choice
 - [OAuth authorization code grant](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/authorization-code-grant)
 - [Session tokens](https://shopify.dev/docs/apps/build/authentication-authorization/session-tokens)
 - [App Bridge](https://shopify.dev/docs/api/app-bridge-library)
+- [App Bridge Resource Fetching API](https://shopify.dev/docs/api/app-home/apis/authentication-and-data/resource-fetching-api)
 - [Using Polaris web components and the UI extension execution model](https://shopify.dev/docs/api/polaris/using-polaris-web-components)
 - [Web pixel strict sandbox](https://shopify.dev/docs/apps/build/marketing-analytics/pixels)
 - [Shopify Functions](https://shopify.dev/docs/api/functions/latest)
