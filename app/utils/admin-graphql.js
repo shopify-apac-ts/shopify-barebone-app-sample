@@ -33,7 +33,8 @@ export async function callAdminGraphql(query, variables = null) {
   }));
 
   if (!response.ok) {
-    throw new Error(`Shopify Admin GraphQL failed ${response.status}: ${body == null ? responseText : JSON.stringify(body)}`);
+    const errorBody = body == null ? previewText(responseText) : redactGraphqlData(body);
+    throw new Error(`Shopify Admin GraphQL failed ${response.status}: ${typeof errorBody === 'string' ? errorBody : JSON.stringify(errorBody)}`);
   }
   if (body == null) {
     throw new Error(`Shopify Admin GraphQL returned invalid JSON: ${previewText(responseText)}`);
@@ -65,7 +66,7 @@ function getGraphqlOperationName(query) {
 
 function redactGraphqlData(value, key = '') {
   if (value == null) return value;
-  if (/token|secret|password|authorization/i.test(key)) return '[redacted]';
+  if (/token|secret|password|authorization|ga4sec|settings/i.test(key)) return '[redacted]';
   if (Array.isArray(value)) return value.map((item) => redactGraphqlData(item));
   if (typeof value === 'object') {
     return Object.fromEntries(
